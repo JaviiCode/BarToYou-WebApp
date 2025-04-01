@@ -3,82 +3,80 @@ import Logo from '../../components/Logo';
 import './Login.css';
 
 function Login() {
-  // Estados para manejar los datos del formulario y errores
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación básica
-    if (!email || !password) {
+    if (!name || !password) {
       setError('Por favor, completa todos los campos.');
       return;
     }
 
-    setLoading(true); // Activa el estado de "cargando"
-    setError(''); // Limpia los errores anteriores
+    setLoading(true);
+    setError('');
 
     try {
-      // Simula una llamada a la API
-      const response = await fetch('http://127.0.0.1:8000/api/login', {
+      const response = await fetch('http://127.0.0.1:8000/login.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Si la respuesta es exitosa, guarda el token y redirige al usuario
         console.log('Login exitoso:', data);
-        localStorage.setItem('token', data.token); // Guarda el token en localStorage
-        window.location.href = '/Dashboard'; // Redirige al dashboard
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = '/Dashboard';
       } else {
-        // Si hay un error, muestra el mensaje de error
         setError(data.message || 'Error al iniciar sesión.');
       }
     } catch (error) {
-      // Maneja errores de red o del servidor
       setError('Error de conexión. Inténtalo de nuevo más tarde.');
     } finally {
-      setLoading(false); // Desactiva el estado de "cargando"
+      setLoading(false);
     }
   };
 
   return (
     <div className="login-container">
-      <Logo/>
-      <h2>Iniciar sesión</h2>
-      {error && <p className="error-message">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+      <div className="login-box">
+        <div className="logo-container">
+          <Logo />
         </div>
-        <div className="form-group">
-          <label>Contraseña:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Cargando...' : 'Ingresar'}
-        </button>
-      </form>
+        <h2>Iniciar sesión</h2>
+        {error && <p className="error-message">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Nombre:</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Contraseña:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" disabled={loading} className="submit-btn">
+            {loading ? 'Cargando...' : 'Ingresar'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
