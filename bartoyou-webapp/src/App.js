@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
 import DrinkMenu from "./pages/DrinkMenu";
 import Login from "./pages/Login";
 
@@ -7,7 +8,14 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/drinks" element={<DrinkMenu />} />
+        <Route 
+          path="/Drinks" 
+          element={
+            //<ProtectedRoute>
+              <DrinkMenu />
+            //</ProtectedRoute>
+          } 
+        />
       </Routes>
     </Router>
   );
