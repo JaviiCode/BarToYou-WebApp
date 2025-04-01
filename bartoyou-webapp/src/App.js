@@ -1,13 +1,15 @@
-
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import DrinkMenu from "./pages/DrinkMenu";
 import Login from "./pages/Login";
-
 
 function App() {
   return (
-    <div>
-      <Login />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/drinks" element={<DrinkMenu />} />
+      </Routes>
+    </Router>
   );
 }
 
