@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-//import "./Menu.css"; // Importamos los estilos CSS
+import DrinkCard from "../../components/DrinkCard";
 
 export default function Menu() {
   const [drinks, setDrinks] = useState([]);
@@ -36,41 +36,85 @@ export default function Menu() {
       );
     }
     if (category) {
-      filtered = filtered.filter((drink) =>
-        drink.category_id.toString() === category
+      filtered = filtered.filter(
+        (drink) => drink.category_id.toString() === category
       );
     }
     setFilteredDrinks(filtered);
   }, [search, category, drinks]);
 
+  // Estilos en línea para el contenedor principal
+  const containerStyle = {
+    minHeight: "100vh",
+    backgroundColor: "#f7fafc",
+    padding: "24px",
+  };
+
   return (
-    <div className="menu-container">
-      <h1 className="menu-title">Menú</h1>
-      <div className="filters">
+    <div style={containerStyle}>
+      <h1
+        style={{
+          fontSize: "2rem",
+          fontWeight: "bold",
+          color: "#e53e3e",
+          marginBottom: "24px",
+          textAlign: "center",
+        }}
+      >
+        Menú de Bebidas
+      </h1>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          marginBottom: "32px",
+          maxWidth: "1200px",
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
+      >
         <input
           type="text"
           placeholder="Buscar por nombre"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          style={{
+            padding: "12px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            flexGrow: 1,
+          }}
         />
+
         <input
           type="text"
           placeholder="Filtrar por categoría"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          style={{
+            padding: "12px",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            flexGrow: 1,
+          }}
         />
       </div>
-      <div className="menu-grid">
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", // Ajuste al nuevo tamaño
+          gap: "20px",
+          maxWidth: "1200px",
+          marginLeft: "auto",
+          marginRight: "auto",
+          padding: "0 15px",
+        }}
+      >
         {filteredDrinks.map((drink) => (
-          <div key={drink.id} className="menu-item">
-            <div className="image-container">
-              <img src={drink.image_url} alt={drink.name} className="drink-image" />
-            </div>
-            <div className="card-content">
-              <h2 className="drink-name">{drink.name}</h2>
-              <p className="drink-description">Descripción del cóctel</p>
-            </div>
-          </div>
+          <DrinkCard key={drink.id} drink={drink} />
         ))}
       </div>
     </div>
