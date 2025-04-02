@@ -30,16 +30,18 @@ function Login() {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.token) {  // Cambio importante aquí
         console.log('Login exitoso:', data);
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         window.location.href = '/Dashboard';
       } else {
-        setError(data.message || 'Error al iniciar sesión.');
+        // Usamos data.error o data.message según lo que devuelva el backend
+        setError(data.error || data.message || 'Error al iniciar sesión.');
       }
     } catch (error) {
       setError('Error de conexión. Inténtalo de nuevo más tarde.');
+      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
