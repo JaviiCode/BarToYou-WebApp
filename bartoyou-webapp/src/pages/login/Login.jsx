@@ -44,12 +44,12 @@ function Login() {
       setLoading(false);
     }
   };
-
+//<Logo />
   return (
     <div className="login-container">
       <div className="login-box">
         <div className="logo-container">
-          <Logo />
+          
         </div>
         <h2>Iniciar sesión</h2>
         {error && <p className="error-message">{error}</p>}
