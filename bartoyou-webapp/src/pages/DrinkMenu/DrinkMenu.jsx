@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import DrinkCard from "../../components/DrinkCard";
+import DrinkCard from "../../components/DrinkCard/DrinkCard";
 
 export default function Menu() {
   const [drinks, setDrinks] = useState([]);

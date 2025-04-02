@@ -1,0 +1,224 @@
+/* Estilos base de la tarjeta */
+.drink-card {
+    position: relative;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    margin-bottom: 15px;
+    border: 1px solid #f3f3f3;
+    width: 280px;
+    transform: translateY(0);
+  }
+  
+  .drink-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Botón del carrito */
+  .cart-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    color: #e53e3e;
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+  
+  .cart-button:hover {
+    transform: scale(1.1);
+    background: #e53e3e;
+    color: white;
+  }
+  
+  .cart-icon {
+    font-size: 16px;
+  }
+  
+  /* Contenedor de imagen */
+  .image-container {
+    height: 160px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .image-container::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30%;
+    background: linear-gradient(to top, rgba(255,255,255,0.8) 0%, transparent 100%);
+  }
+  
+  .drink-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .drink-card:hover .drink-image {
+    transform: scale(1.05);
+  }
+  
+  /* Contenido de la tarjeta */
+  .card-content {
+    padding: 15px;
+  }
+  
+  .drink-title {
+    color: #e53e3e;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+    transition: color 0.3s ease;
+  }
+  
+  .drink-card:hover .drink-title {
+    color: #c53030;
+  }
+  
+  .drink-description {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  
+  .price-container {
+    margin-top: 0.5rem;
+    font-weight: bold;
+    font-size: 0.95rem;
+  }
+  
+  .price-value {
+    color: #e53e3e;
+    font-size: 1.1rem;
+  }
+  
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  
+  .modal h3 {
+    color: #e53e3e;
+    margin-bottom: 10px;
+  }
+  
+  .modal p {
+    margin-bottom: 20px;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .cancel-button {
+    background: #f3f3f3;
+    color: #333;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .cancel-button:hover {
+    background: #e0e0e0;
+  }
+  
+  .confirm-button {
+    background: #e53e3e;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .confirm-button:hover {
+    background: #c53030;
+  }
+  
+  .confirm-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Efecto de añadido */
+  .added-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    animation: fadeInOut 1.5s ease-in-out;
+  }
+  
+  .cart-icon-effect {
+    font-size: 2rem;
+    color: #e53e3e;
+    margin-bottom: 10px;
+    animation: bounce 0.5s ease infinite alternate;
+  }
+  
+  .added-effect span {
+    font-weight: bold;
+    color: #e53e3e;
+  }
+  
+  /* Animaciones */
+  @keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+  }
