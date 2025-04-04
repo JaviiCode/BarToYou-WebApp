@@ -62,7 +62,7 @@ export default function Menu() {
     { 
       id: 7, 
       name: "Refrescos", 
-      image_url: batidosImg,
+      image_url: "/images/categories/juices.jpg",
       description: "Naturales y recién exprimidos"
     },
     { 
