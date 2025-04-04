@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import DrinkCard from "../../components/DrinkCard/DrinkCard";
+import { FaShoppingCart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Menu() {
   const [drinks, setDrinks] = useState([]);
   const [filteredDrinks, setFilteredDrinks] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -43,7 +46,6 @@ export default function Menu() {
     setFilteredDrinks(filtered);
   }, [search, category, drinks]);
 
-  // Estilos en línea para el contenedor principal
   const containerStyle = {
     minHeight: "100vh",
     backgroundColor: "#f7fafc",
@@ -67,45 +69,77 @@ export default function Menu() {
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
-          gap: "16px",
+          justifyContent: "space-between",
+          alignItems: "center",
           marginBottom: "32px",
           maxWidth: "1200px",
           marginLeft: "auto",
           marginRight: "auto",
+          padding: "0 15px",
+          gap: "20px",
         }}
       >
-        <input
-          type="text"
-          placeholder="Buscar por nombre"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+        <div
           style={{
-            padding: "12px",
-            border: "1px solid #e2e8f0",
-            borderRadius: "8px",
-            flexGrow: 1,
+            display: "flex",
+            gap: "16px",
+            width: "60%", // Ajusta este valor según necesites
           }}
-        />
+        >
+          <input
+            type="text"
+            placeholder="Buscar por nombre"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              padding: "12px",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              width: "200px", // Ancho fijo para los inputs
+            }}
+          />
 
-        <input
-          type="text"
-          placeholder="Filtrar por categoría"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          <input
+            type="text"
+            placeholder="Filtrar por categoría"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            style={{
+              padding: "12px",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              width: "200px", // Ancho fijo para los inputs
+            }}
+          />
+        </div>
+
+        <button
+          onClick={() => navigate("/carrito")} // Ajusta la ruta según tu configuración
           style={{
-            padding: "12px",
-            border: "1px solid #e2e8f0",
+            padding: "12px 20px",
+            backgroundColor: "#e53e3e",
+            color: "white",
+            border: "none",
             borderRadius: "8px",
-            flexGrow: 1,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontWeight: "bold",
+            transition: "background-color 0.3s",
           }}
-        />
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#c53030")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#e53e3e")}
+        >
+          <FaShoppingCart />
+          Ir al Carrito
+        </button>
       </div>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", // Ajuste al nuevo tamaño
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
           gap: "20px",
           maxWidth: "1200px",
           marginLeft: "auto",
