@@ -1,14 +1,63 @@
 import { useState, useEffect } from "react";
-import DrinkCard from "../../components/DrinkCard/DrinkCard";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import DrinkCard from "../../components/DrinkCard/DrinkCard";
+import CategoryCard from "../../components/CategoryCard/CategoryCard";
+import "./DrinkMenu.css";
 
 export default function Menu() {
   const [drinks, setDrinks] = useState([]);
   const [filteredDrinks, setFilteredDrinks] = useState([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [view, setView] = useState("categories");
   const navigate = useNavigate();
+
+  // Categorías definidas en frontend con imágenes locales
+  const drinkCategories = [
+    { 
+      id: 1, 
+      name: "Cócteles", 
+      image_url: "/images/categories/cocktails.jpg",
+      description: "Mezclas creativas con alcohol"
+    },
+    { 
+      id: 2, 
+      name: "Bebidas con Alcohol", 
+      image_url: "/images/categories/alcoholic.jpg",
+      description: "Licores y bebidas espirituosas"
+    },
+    { 
+      id: 3, 
+      name: "Bebidas sin Alcohol", 
+      image_url: "/images/categories/non-alcoholic.jpg",
+      description: "Refrescantes y sin alcohol"
+    },
+    { 
+      id: 4, 
+      name: "Digestivos", 
+      image_url: "/images/categories/digestives.jpg",
+      description: "Para después de comer"
+    },
+    { 
+      id: 5, 
+      name: "Aguas", 
+      image_url: "/images/categories/waters.jpg",
+      description: "Minerales y sabores"
+    },
+    { 
+      id: 6, 
+      name: "Zumos", 
+      image_url: "/images/categories/juices.jpg",
+      description: "Naturales y recién exprimidos"
+    },
+    { 
+      id: 7, 
+      name: "Batidos", 
+      image_url: "/images/categories/smoothies.jpg",
+      description: "Cremosos y deliciosos"
+    }
+  ];
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -26,130 +75,89 @@ export default function Menu() {
           image_url: `${baseURL}${drink.image_url}`,
         }));
         setDrinks(drinksWithFullImageURL);
-        setFilteredDrinks(drinksWithFullImageURL);
       })
       .catch((error) => console.error("Error al obtener datos:", error));
   }, []);
 
   useEffect(() => {
     let filtered = drinks;
+    
     if (search) {
       filtered = filtered.filter((drink) =>
         drink.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-    if (category) {
+    
+    if (selectedCategory) {
       filtered = filtered.filter(
-        (drink) => drink.category_id.toString() === category
+        (drink) => drink.category_id.toString() === selectedCategory.id.toString()
       );
     }
+    
     setFilteredDrinks(filtered);
-  }, [search, category, drinks]);
+  }, [search, selectedCategory, drinks]);
 
-  const containerStyle = {
-    minHeight: "100vh",
-    backgroundColor: "#f7fafc",
-    padding: "24px",
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setView("drinks");
+  };
+
+  const handleBackToCategories = () => {
+    setSelectedCategory(null);
+    setView("categories");
+    setSearch("");
   };
 
   return (
-    <div style={containerStyle}>
-      <h1
-        style={{
-          fontSize: "2rem",
-          fontWeight: "bold",
-          color: "#e53e3e",
-          marginBottom: "24px",
-          textAlign: "center",
-        }}
-      >
-        Menú de Bebidas
+    <div className="menu-container">
+      <h1 className="menu-title">
+        {view === "categories" ? "Categorías de Bebidas" : selectedCategory?.name}
       </h1>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "32px",
-          maxWidth: "1200px",
-          marginLeft: "auto",
-          marginRight: "auto",
-          padding: "0 15px",
-          gap: "20px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "16px",
-            width: "60%", // Ajusta este valor según necesites
-          }}
-        >
+      <div className="menu-actions">
+        {view === "drinks" && (
+          <button
+            onClick={handleBackToCategories}
+            className="back-button"
+          >
+            <FaChevronLeft />
+            Volver
+          </button>
+        )}
+
+        {view === "drinks" && (
           <input
             type="text"
-            placeholder="Buscar por nombre"
+            placeholder="Buscar bebidas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{
-              padding: "12px",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              width: "200px", // Ancho fijo para los inputs
-            }}
+            className="search-input"
           />
-
-          <input
-            type="text"
-            placeholder="Filtrar por categoría"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            style={{
-              padding: "12px",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              width: "200px", // Ancho fijo para los inputs
-            }}
-          />
-        </div>
+        )}
 
         <button
-          onClick={() => navigate("/carrito")} // Ajusta la ruta según tu configuración
-          style={{
-            padding: "12px 20px",
-            backgroundColor: "#e53e3e",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            fontWeight: "bold",
-            transition: "background-color 0.3s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#c53030")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#e53e3e")}
+          onClick={() => navigate("/carrito")}
+          className="cart-button"
         >
           <FaShoppingCart />
           Ir al Carrito
         </button>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: "20px",
-          maxWidth: "1200px",
-          marginLeft: "auto",
-          marginRight: "auto",
-          padding: "0 15px",
-        }}
-      >
-        {filteredDrinks.map((drink) => (
-          <DrinkCard key={drink.id} drink={drink} />
-        ))}
+      <div className={`items-grid ${view}-view`}>
+        {view === "categories" ? (
+          drinkCategories.map((category) => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              onClick={() => handleCategorySelect(category)}
+            />
+          ))
+        ) : (
+          filteredDrinks.map((drink) => (
+            <DrinkCard key={drink.id} drink={drink} />
+          ))
+        )}
       </div>
     </div>
   );
