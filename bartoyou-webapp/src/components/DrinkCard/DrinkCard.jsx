@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaShoppingCart } from 'react-icons/fa';
+import { FaShoppingCart } from "react-icons/fa";
 import { useCookies } from 'react-cookie';
 import './DrinkCard.css';
 
@@ -20,7 +20,6 @@ const DrinkCard = ({ drink }) => {
       currentCart.push({
         id: drink.id,
         name: drink.name,
-        price: drink.price,
         image: drink.image_url,
         quantity: 1
       });
@@ -53,18 +52,13 @@ const DrinkCard = ({ drink }) => {
         <p className="drink-description">
           {drink.description || "Descripción del cóctel"}
         </p>
-        {drink.price && (
-          <div className="price-container">
-            Precio: <span className="price-value">${drink.price}</span>
-          </div>
-        )}
       </div>
 
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
             <h3>¿Añadir {drink.name} al carrito?</h3>
-            <p>${drink.price} • {drink.description || "Bebida especial"}</p>
+            <p>{drink.description || "Bebida especial"}</p>
             <div className="modal-buttons">
               <button 
                 onClick={() => setShowModal(false)}

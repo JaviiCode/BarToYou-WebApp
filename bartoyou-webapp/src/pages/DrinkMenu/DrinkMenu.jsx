@@ -62,7 +62,7 @@ export default function Menu() {
     { 
       id: 7, 
       name: "Refrescos", 
-      image_url: "/images/categories/juices.jpg",
+      image_url: batidosImg,
       description: "Naturales y recién exprimidos"
     },
     { 
@@ -93,6 +93,10 @@ export default function Menu() {
       .catch((error) => console.error("Error al obtener datos:", error));
   }, []);
 
+  useEffect(() => {
+    console.log("Drinks from API:", drinks);
+  }, [drinks]);
+  
   useEffect(() => {
     let filtered = drinks;
     
@@ -150,7 +154,7 @@ export default function Menu() {
         )}
 
         <button
-          onClick={() => navigate("/carrito")}
+          onClick={() => navigate("/Carry")}
           className="cart-button"
         >
           <FaShoppingCart />
