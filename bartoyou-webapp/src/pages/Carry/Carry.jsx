@@ -6,6 +6,7 @@ const Carry = () => {
   const [cookies, , removeCookie] = useCookies(['cart']);
   const [cartItems, setCartItems] = useState([]);
   const [hasAlcoholicDrinks, setHasAlcoholicDrinks] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (cookies.cart) {
@@ -25,7 +26,7 @@ const Carry = () => {
     }
   }, [cookies.cart]);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (hasAlcoholicDrinks) {
       const isAdult = window.confirm("Hay bebidas alcohólicas en tu pedido. ¿Eres mayor de 18 años?");
       if (!isAdult) {
@@ -33,10 +34,51 @@ const Carry = () => {
         return;
       }
     }
+
+    setIsSubmitting(true);
+    const token = localStorage.getItem("token");
     
-    alert("Pedido realizado con éxito!");
-    removeCookie('cart', { path: '/' });
-    setCartItems([]);
+    try {
+      // Enviar cada item del carrito como una orden separada
+      const orderPromises = cartItems.map(item => {
+        const orderData = {
+          member_id: 3, // Esto debería venir de la sesión del usuario
+          consumption_id: item.id,
+          quantity: item.quantity || 1,
+          status_id: 1 // Estado inicial (pendiente)
+        };
+
+        return fetch("http://127.0.0.1:8000/api/bartoyou/orders/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(orderData)
+        });
+      });
+
+      // Esperar a que todas las peticiones se completen
+      const responses = await Promise.all(orderPromises);
+      const results = await Promise.all(responses.map(res => res.json()));
+
+      // Verificar si todas las órdenes fueron exitosas
+      const allSuccess = results.every(result => result.success !== false);
+      
+      if (allSuccess) {
+        alert("¡Pedido realizado con éxito!");
+        // Limpiar el carrito
+        removeCookie('cart', { path: '/' });
+        setCartItems([]);
+      } else {
+        throw new Error("Algunos items no pudieron ser procesados");
+      }
+    } catch (error) {
+      console.error("Error al realizar el pedido:", error);
+      alert("Ocurrió un error al procesar tu pedido. Por favor intenta nuevamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -66,8 +108,9 @@ const Carry = () => {
               <button 
                 onClick={handlePlaceOrder}
                 className="place-order-btn"
+                disabled={isSubmitting}
               >
-                Realizar Pedido
+                {isSubmitting ? 'Procesando...' : 'Realizar Pedido'}
               </button>
             </div>
           </>
