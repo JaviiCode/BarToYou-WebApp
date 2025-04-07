@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import DrinkMenu from "./pages/DrinkMenu";
+import Carry from "./pages/Carry";
 
 function App() {
   return (
@@ -24,6 +25,14 @@ function App() {
             element={
               //<ProtectedRoute>
                 <DrinkMenu />
+              //</ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/Carry" 
+            element={
+              //<ProtectedRoute>
+                <Carry />
               //</ProtectedRoute>
             } 
           />
