@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import './Carry.css';
+import { FaTrash, FaEdit, FaCheck } from 'react-icons/fa';
 
 const Carry = () => {
-  const [cookies, , removeCookie] = useCookies(['cart']);
+  const [cookies, setCookie, removeCookie] = useCookies(['cart']);
   const [cartItems, setCartItems] = useState([]);
   const [hasAlcoholicDrinks, setHasAlcoholicDrinks] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [editQuantity, setEditQuantity] = useState(1);
 
   useEffect(() => {
     if (cookies.cart) {
-      // Filtramos items válidos que tengan al menos id y name
       const validItems = cookies.cart.filter(item => item && item.id && item.name);
       setCartItems(validItems);
       
-      // Verificar si hay bebidas alcohólicas
       const alcoholic = validItems.some(item => 
         item.name.toLowerCase().includes('alcohólic') || 
         item.name.toLowerCase().includes('alcohol') ||
@@ -25,6 +26,33 @@ const Carry = () => {
       setHasAlcoholicDrinks(alcoholic);
     }
   }, [cookies.cart]);
+
+  const handleRemoveItem = (itemId) => {
+    const updatedCart = cartItems.filter(item => item.id !== itemId);
+    setCookie('cart', updatedCart, { path: '/' });
+    setCartItems(updatedCart);
+  };
+
+  const handleEditQuantity = (item) => {
+    setEditingItem(item.id);
+    setEditQuantity(item.quantity);
+  };
+
+  const handleSaveQuantity = () => {
+    const updatedCart = cartItems.map(item => 
+      item.id === editingItem ? { ...item, quantity: editQuantity } : item
+    );
+    setCookie('cart', updatedCart, { path: '/' });
+    setCartItems(updatedCart);
+    setEditingItem(null);
+  };
+
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= 5) {
+      setEditQuantity(value);
+    }
+  };
 
   const handlePlaceOrder = async () => {
     if (hasAlcoholicDrinks) {
@@ -39,13 +67,12 @@ const Carry = () => {
     const token = localStorage.getItem("token");
     
     try {
-      // Enviar cada item del carrito como una orden separada
       const orderPromises = cartItems.map(item => {
         const orderData = {
-          member_id: 3, // Esto debería venir de la sesión del usuario
+          member_id: 3,
           consumption_id: item.id,
-          quantity: item.quantity || 1,
-          status_id: 1 // Estado inicial (pendiente)
+          quantity: item.quantity,
+          status_id: 1
         };
 
         return fetch("http://127.0.0.1:8000/api/bartoyou/orders/", {
@@ -58,16 +85,13 @@ const Carry = () => {
         });
       });
 
-      // Esperar a que todas las peticiones se completen
       const responses = await Promise.all(orderPromises);
       const results = await Promise.all(responses.map(res => res.json()));
 
-      // Verificar si todas las órdenes fueron exitosas
       const allSuccess = results.every(result => result.success !== false);
       
       if (allSuccess) {
         alert("¡Pedido realizado con éxito!");
-        // Limpiar el carrito
         removeCookie('cart', { path: '/' });
         setCartItems([]);
       } else {
@@ -89,8 +113,8 @@ const Carry = () => {
         {cartItems.length > 0 ? (
           <>
             <ul className="cart-items-list">
-              {cartItems.map((item, index) => (
-                <li key={index} className="cart-item">
+              {cartItems.map((item) => (
+                <li key={item.id} className="cart-item">
                   {item.image && (
                     <div className="item-image">
                       <img src={item.image} alt={item.name} />
@@ -98,7 +122,39 @@ const Carry = () => {
                   )}
                   <div className="item-details">
                     <h3>{item.name}</h3>
-                    {item.quantity && <p>Cantidad: {item.quantity}</p>}
+                    {editingItem === item.id ? (
+                      <div className="quantity-edit">
+                        <input
+                          type="number"
+                          min="1"
+                          max="5"
+                          value={editQuantity}
+                          onChange={handleQuantityChange}
+                        />
+                        <button 
+                          onClick={handleSaveQuantity}
+                          className="save-quantity-btn"
+                        >
+                          <FaCheck />
+                        </button>
+                      </div>
+                    ) : (
+                      <p>Cantidad: {item.quantity}</p>
+                    )}
+                  </div>
+                  <div className="item-actions">
+                    <button 
+                      onClick={() => handleEditQuantity(item)}
+                      className="edit-btn"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button 
+                      onClick={() => handleRemoveItem(item.id)}
+                      className="remove-btn"
+                    >
+                      <FaTrash />
+                    </button>
                   </div>
                 </li>
               ))}
