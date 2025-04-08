@@ -7,21 +7,30 @@ const DrinkCard = ({ drink }) => {
   const [cookies, setCookie] = useCookies(['cart']);
   const [showModal, setShowModal] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   const addToCart = () => {
     setIsAdding(true);
     
     const currentCart = cookies.cart || [];
     const existingItemIndex = currentCart.findIndex(item => item.id === drink.id);
+    const totalItemsInCart = currentCart.reduce((total, item) => total + item.quantity, 0);
+    
+    // Verificar límite de 5 bebidas
+    if (totalItemsInCart + quantity > 5) {
+      alert("No puedes añadir más de 5 bebidas en total al carrito");
+      setIsAdding(false);
+      return;
+    }
     
     if (existingItemIndex >= 0) {
-      currentCart[existingItemIndex].quantity += 1;
+      currentCart[existingItemIndex].quantity += quantity;
     } else {
       currentCart.push({
         id: drink.id,
         name: drink.name,
         image: drink.image_url,
-        quantity: 1
+        quantity: quantity
       });
     }
     
@@ -30,7 +39,15 @@ const DrinkCard = ({ drink }) => {
     setTimeout(() => {
       setIsAdding(false);
       setShowModal(false);
+      setQuantity(1); // Resetear cantidad después de añadir
     }, 1000);
+  };
+
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= 5) {
+      setQuantity(value);
+    }
   };
 
   return (
@@ -59,9 +76,26 @@ const DrinkCard = ({ drink }) => {
           <div className="modal">
             <h3>¿Añadir {drink.name} al carrito?</h3>
             <p>{drink.description || "Bebida especial"}</p>
+            
+            <div className="quantity-selector">
+              <label htmlFor="quantity">Cantidad:</label>
+              <input
+                type="number"
+                id="quantity"
+                min="1"
+                max="5"
+                value={quantity}
+                onChange={handleQuantityChange}
+              />
+              <span>(Máx. 5 por pedido)</span>
+            </div>
+            
             <div className="modal-buttons">
               <button 
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setQuantity(1);
+                }}
                 className="cancel-button"
               >
                 Cancelar
@@ -81,7 +115,7 @@ const DrinkCard = ({ drink }) => {
       {isAdding && (
         <div className="added-effect">
           <FaShoppingCart className="cart-icon-effect" />
-          <span>¡Añadido!</span>
+          <span>¡Añadido {quantity} {quantity === 1 ? 'unidad' : 'unidades'}!</span>
         </div>
       )}
     </div>
