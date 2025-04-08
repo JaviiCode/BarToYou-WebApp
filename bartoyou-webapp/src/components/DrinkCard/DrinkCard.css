@@ -206,9 +206,37 @@
   }
   
   .added-effect span {
-    font-weight: bold;
-    color: #e53e3e;
+    margin-top: 5px;
   }
+  /* Estilos para el selector de cantidad */
+.quantity-selector {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quantity-selector label {
+  font-weight: bold;
+  color: #333;
+}
+
+.quantity-selector input {
+  width: 60px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.quantity-selector span {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Ajustes para el mensaje de añadido */
+
   
   /* Animaciones */
   @keyframes fadeInOut {
