@@ -163,7 +163,7 @@ const CustomDrink = () => {
       try {
         result = await response.json();
       } catch (jsonError) {
-        const text = await response.text();
+        const text = await response.text(); // Si no es JSON, obtenemos el texto plano
         console.error("❌ Respuesta no JSON:", text);
         throw new Error("Respuesta no válida del servidor");
       }
