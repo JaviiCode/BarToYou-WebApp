@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import DrinkMenu from "./pages/DrinkMenu";
 import Carry from "./pages/Carry";
+import CustomDrink from "./pages/CustomDrink";
 
 function App() {
   return (
@@ -33,6 +34,14 @@ function App() {
             element={
               //<ProtectedRoute>
                 <Carry />
+              //</ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/CustomDrink" 
+            element={
+              //<ProtectedRoute>
+                <CustomDrink />
               //</ProtectedRoute>
             } 
           />

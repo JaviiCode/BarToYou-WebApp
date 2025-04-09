@@ -9,7 +9,7 @@ import customIcon from "../../assets/icons/custom.png";
 function Dashboard() {
   const cards = [
     { title: 'Menú', icon: menuIcon, desc: 'Escoge entre las decenas de bebidas que tenemos disponibles en nuestro bar. Hecha un ojo a la carta, pide lo que mas te guste y relajate hasta que te lo traigan !', path: '/Drinks' },
-    { title: 'Bebida Personalizada', icon: customIcon, desc: 'Manages and displays important customer information', path: '/Client' },
+    { title: 'Bebida Personalizada', icon: customIcon, desc: 'Saca tu lado mas personal creando tu propia bebida, escogeentre la gran variedad de ingredientes que tenemos. Relajate y disfruta mientras nuestros camareros hacen tu deseo realidad.', path: '/CustomDrink' },
   ];
 
   return (
