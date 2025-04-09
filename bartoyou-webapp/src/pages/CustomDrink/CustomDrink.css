@@ -160,6 +160,22 @@
     border-bottom: 1px solid #eee;
   }
   
+  .loading-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 50px;
+  }
+  
+  .ingredient-row select option {
+    padding: 5px;
+  }
+  
+  .ingredient-row select option:disabled {
+    color: #999;
+    font-style: italic;
+  }
+  
   /* Responsive */
   @media (max-width: 768px) {
     .form-container {

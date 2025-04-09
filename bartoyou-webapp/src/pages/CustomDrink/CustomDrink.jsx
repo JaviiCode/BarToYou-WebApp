@@ -3,7 +3,7 @@ import './CustomDrink.css';
 
 const CustomDrink = () => {
   const [formData, setFormData] = useState({
-    user_id: 1, 
+    user_id: 1,
     base_drink: '',
     base_drink_id: null,
     ingredients: [],
@@ -15,30 +15,55 @@ const CustomDrink = () => {
   const [availableBases, setAvailableBases] = useState([]);
   const [availableIngredients, setAvailableIngredients] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Obtener datos de la API
   useEffect(() => {
-    setAvailableBases([
-      { id: 1, name: 'Margarita' },
-      { id: 2, name: 'Mojito' },
-      { id: 3, name: 'Daiquiri' }
-    ]);
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        
+        const [basesRes, ingredientsRes] = await Promise.all([
+          fetch('http://127.0.0.1:8000/api/bartoyou/consumptions', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }),
+          fetch('http://127.0.0.1:8000/api/bartoyou/ingredients', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+        ]);
+        
+        const basesData = await basesRes.json();
+        const ingredientsData = await ingredientsRes.json();
+        
+        setAvailableBases(basesData.data);
+        setAvailableIngredients(ingredientsData.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('Error al cargar los datos. Por favor recarga la página.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setAvailableIngredients([
-      { id: 1, name: 'Tequila', unit: 'ml' },
-      { id: 2, name: 'Triple Sec', unit: 'ml' },
-      { id: 3, name: 'Jugo de limón', unit: 'ml' },
-      { id: 4, name: 'Azúcar', unit: 'cucharadas' }
-    ]);
+    fetchData();
   }, []);
 
   useEffect(() => {
-    setPreviewData({
-      ...formData,
-      ingredients: formData.ingredients.map(ing => ({
-        ...ing,
-        ingredient_name: availableIngredients.find(i => i.id === ing.ingredient_id)?.name || 'Desconocido'
-      }))
-    });
+    // Actualizar el preview cada vez que cambien los datos
+    if (availableIngredients.length > 0) {
+      setPreviewData({
+        ...formData,
+        ingredients: formData.ingredients.map(ing => ({
+          ...ing,
+          ingredient_name: availableIngredients.find(i => i.id === ing.ingredient_id)?.name || 'Desconocido',
+          unit: availableIngredients.find(i => i.id === ing.ingredient_id)?.ingredient_unit || 'unidades'
+        }))
+      });
+    }
   }, [formData, availableIngredients]);
 
   const handleBaseDrinkChange = (e) => {
@@ -56,10 +81,10 @@ const CustomDrink = () => {
       ingredients: [
         ...formData.ingredients,
         {
-          consumption_id: 1,
+          consumption_id: 1, 
           ingredient_id: '',
           amount: '',
-          unit: 'ml' 
+          unit: 'ml'
         }
       ]
     });
@@ -74,7 +99,7 @@ const CustomDrink = () => {
     if (field === 'ingredient_id') {
       const selectedIngredient = availableIngredients.find(i => i.id === parseInt(value));
       if (selectedIngredient) {
-        updatedIngredients[index].unit = selectedIngredient.unit;
+        updatedIngredients[index].unit = selectedIngredient.ingredient_unit;
       }
     }
 
@@ -97,11 +122,12 @@ const CustomDrink = () => {
     setIsSubmitting(true);
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('http://127.0.0.1:8000/api/custom-drink', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
@@ -126,6 +152,15 @@ const CustomDrink = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="custom-drink-page">
+        <h1 className="page-title">Crear Bebida Personalizada</h1>
+        <div className="loading-message">Cargando datos...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="custom-drink-page">
@@ -158,7 +193,7 @@ const CustomDrink = () => {
                 >
                   <option value="">Selecciona ingrediente</option>
                   {availableIngredients.map(ing => (
-                    <option key={ing.id} value={ing.id}>{ing.name}</option>
+                    <option key={ing.id} value={ing.id}>{ing.name} ({ing.stock} {ing.ingredient_unit} disponibles)</option>
                   ))}
                 </select>
                 
