@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
-import './CustomDrink.css';
+import { useState, useEffect } from "react";
+import "./CustomDrink.css";
 
 const CustomDrink = () => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
   const [formData, setFormData] = useState({
-    user_id: 1,
-    base_drink: '',
+    user_id: storedUser?.id || null,
+    base_drink: "",
     base_drink_id: null,
     ingredients: [],
     ice: false,
-    ice_type: ''
+    ice_type: "",
   });
 
   const [previewData, setPreviewData] = useState(null);
@@ -21,29 +22,29 @@ const CustomDrink = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        
+        const token = localStorage.getItem("token");
+
         const [basesRes, ingredientsRes] = await Promise.all([
-          fetch('http://127.0.0.1:8000/api/bartoyou/consumptions', {
+          fetch("http://127.0.0.1:8000/api/bartoyou/consumptions", {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }),
-          fetch('http://127.0.0.1:8000/api/bartoyou/ingredients', {
+          fetch("http://127.0.0.1:8000/api/bartoyou/ingredients", {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          })
+              Authorization: `Bearer ${token}`,
+            },
+          }),
         ]);
-        
+
         const basesData = await basesRes.json();
         const ingredientsData = await ingredientsRes.json();
-        
+
         setAvailableBases(basesData.data);
         setAvailableIngredients(ingredientsData.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
-        alert('Error al cargar los datos. Por favor recarga la página.');
+        console.error("Error fetching data:", error);
+        alert("Error al cargar los datos. Por favor recarga la página.");
       } finally {
         setIsLoading(false);
       }
@@ -57,21 +58,27 @@ const CustomDrink = () => {
     if (availableIngredients.length > 0) {
       setPreviewData({
         ...formData,
-        ingredients: formData.ingredients.map(ing => ({
+        ingredients: formData.ingredients.map((ing) => ({
           ...ing,
-          ingredient_name: availableIngredients.find(i => i.id === ing.ingredient_id)?.name || 'Desconocido',
-          unit: availableIngredients.find(i => i.id === ing.ingredient_id)?.ingredient_unit || 'unidades'
-        }))
+          ingredient_name:
+            availableIngredients.find((i) => i.id === ing.ingredient_id)
+              ?.name || "Desconocido",
+          unit:
+            availableIngredients.find((i) => i.id === ing.ingredient_id)
+              ?.ingredient_unit || "unidades",
+        })),
       });
     }
   }, [formData, availableIngredients]);
 
   const handleBaseDrinkChange = (e) => {
-    const selectedBase = availableBases.find(b => b.id === parseInt(e.target.value));
+    const selectedBase = availableBases.find(
+      (b) => b.id === parseInt(e.target.value)
+    );
     setFormData({
       ...formData,
-      base_drink: selectedBase?.name || '',
-      base_drink_id: selectedBase?.id || null
+      base_drink: selectedBase?.name || "",
+      base_drink_id: selectedBase?.id || null,
     });
   };
 
@@ -81,23 +88,29 @@ const CustomDrink = () => {
       ingredients: [
         ...formData.ingredients,
         {
-          consumption_id: 1, 
-          ingredient_id: '',
-          amount: '',
-          unit: 'ml'
-        }
-      ]
+          consumption_id: 1,
+          ingredient_id: "",
+          amount: "",
+          unit: "ml",
+        },
+      ],
     });
   };
 
   const handleIngredientChange = (index, field, value) => {
     const updatedIngredients = [...formData.ingredients];
-    updatedIngredients[index][field] = field === 'ingredient_id' || field === 'amount' ? 
-      (field === 'amount' ? parseInt(value) || 0 : parseInt(value)) : value;
-    
+    updatedIngredients[index][field] =
+      field === "ingredient_id" || field === "amount"
+        ? field === "amount"
+          ? parseInt(value) || 0
+          : parseInt(value)
+        : value;
+
     // Actualizar la unidad automáticamente si cambia el ingrediente
-    if (field === 'ingredient_id') {
-      const selectedIngredient = availableIngredients.find(i => i.id === parseInt(value));
+    if (field === "ingredient_id") {
+      const selectedIngredient = availableIngredients.find(
+        (i) => i.id === parseInt(value)
+      );
       if (selectedIngredient) {
         updatedIngredients[index].unit = selectedIngredient.ingredient_unit;
       }
@@ -105,15 +118,17 @@ const CustomDrink = () => {
 
     setFormData({
       ...formData,
-      ingredients: updatedIngredients
+      ingredients: updatedIngredients,
     });
   };
 
   const handleRemoveIngredient = (index) => {
-    const updatedIngredients = formData.ingredients.filter((_, i) => i !== index);
+    const updatedIngredients = formData.ingredients.filter(
+      (_, i) => i !== index
+    );
     setFormData({
       ...formData,
-      ingredients: updatedIngredients
+      ingredients: updatedIngredients,
     });
   };
 
@@ -121,33 +136,56 @@ const CustomDrink = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const cleanedIngredients = formData.ingredients.filter(
+      (ing) =>
+        ing.ingredient_id && ing.amount > 0 && ing.unit && ing.consumption_id
+    );
+
+    const payload = {
+      ...formData,
+      ingredients: cleanedIngredients,
+    };
+
+    console.log("📦 Payload que se enviará:", payload);
+
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://127.0.0.1:8000/api/custom-drink', {
-        method: 'POST',
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://127.0.0.1:8000/api/custom-drink", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error('Error en la petición');
+      let result;
+      try {
+        result = await response.json();
+      } catch (jsonError) {
+        const text = await response.text();
+        console.error("❌ Respuesta no JSON:", text);
+        throw new Error("Respuesta no válida del servidor");
+      }
 
-      const result = await response.json();
-      alert('¡Bebida personalizada creada con éxito!');
-      // Resetear el formulario después del éxito
+      if (!response.ok) {
+        console.error("❌ Error del servidor:", result);
+        throw new Error(result.message || "Error en la petición");
+      }
+
+      alert(`✅ Bebida personalizada creada con ID ${result.custom_drink_id}`);
+
       setFormData({
-        ...formData,
-        base_drink: '',
+        user_id: storedUser?.id || null,
+        base_drink: "",
         base_drink_id: null,
         ingredients: [],
         ice: false,
-        ice_type: ''
+        ice_type: "",
       });
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al crear la bebida. Por favor intenta nuevamente.');
+      console.error("⚠️ Error en el envío:", error);
+      alert("Hubo un error al crear la bebida. Revisa los campos.");
     } finally {
       setIsSubmitting(false);
     }
@@ -165,19 +203,21 @@ const CustomDrink = () => {
   return (
     <div className="custom-drink-page">
       <h1 className="page-title">Crear Bebida Personalizada</h1>
-      
+
       <div className="form-container">
         <form onSubmit={handleSubmit} className="drink-form">
           <div className="form-group">
             <label>Bebida Base:</label>
-            <select 
-              value={formData.base_drink_id || ''}
+            <select
+              value={formData.base_drink_id || ""}
               onChange={handleBaseDrinkChange}
               required
             >
               <option value="">Selecciona una base</option>
-              {availableBases.map(base => (
-                <option key={base.id} value={base.id}>{base.name}</option>
+              {availableBases.map((base) => (
+                <option key={base.id} value={base.id}>
+                  {base.name}
+                </option>
               ))}
             </select>
           </div>
@@ -187,29 +227,39 @@ const CustomDrink = () => {
             {formData.ingredients.map((ingredient, index) => (
               <div key={index} className="ingredient-row">
                 <select
-                  value={ingredient.ingredient_id || ''}
-                  onChange={(e) => handleIngredientChange(index, 'ingredient_id', e.target.value)}
+                  value={ingredient.ingredient_id || ""}
+                  onChange={(e) =>
+                    handleIngredientChange(
+                      index,
+                      "ingredient_id",
+                      e.target.value
+                    )
+                  }
                   required
                 >
                   <option value="">Selecciona ingrediente</option>
-                  {availableIngredients.map(ing => (
-                    <option key={ing.id} value={ing.id}>{ing.name} ({ing.stock} {ing.ingredient_unit} disponibles)</option>
+                  {availableIngredients.map((ing) => (
+                    <option key={ing.id} value={ing.id}>
+                      {ing.name} ({ing.stock} {ing.ingredient_unit} disponibles)
+                    </option>
                   ))}
                 </select>
-                
+
                 <input
                   type="number"
                   placeholder="Cantidad"
-                  value={ingredient.amount || ''}
-                  onChange={(e) => handleIngredientChange(index, 'amount', e.target.value)}
+                  value={ingredient.amount || ""}
+                  onChange={(e) =>
+                    handleIngredientChange(index, "amount", e.target.value)
+                  }
                   min="1"
                   required
                 />
-                
+
                 <span>{ingredient.unit}</span>
-                
-                <button 
-                  type="button" 
+
+                <button
+                  type="button"
                   onClick={() => handleRemoveIngredient(index)}
                   className="remove-btn"
                 >
@@ -217,9 +267,9 @@ const CustomDrink = () => {
                 </button>
               </div>
             ))}
-            
-            <button 
-              type="button" 
+
+            <button
+              type="button"
               onClick={handleAddIngredient}
               className="add-ingredient-btn"
             >
@@ -232,7 +282,9 @@ const CustomDrink = () => {
               <input
                 type="checkbox"
                 checked={formData.ice}
-                onChange={(e) => setFormData({...formData, ice: e.target.checked})}
+                onChange={(e) =>
+                  setFormData({ ...formData, ice: e.target.checked })
+                }
               />
               ¿Lleva hielo?
             </label>
@@ -243,7 +295,9 @@ const CustomDrink = () => {
               <label>Tipo de hielo:</label>
               <select
                 value={formData.ice_type}
-                onChange={(e) => setFormData({...formData, ice_type: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, ice_type: e.target.value })
+                }
               >
                 <option value="">Selecciona tipo</option>
                 <option value="picado">Picado</option>
@@ -253,12 +307,8 @@ const CustomDrink = () => {
             </div>
           )}
 
-          <button 
-            type="submit" 
-            className="submit-btn"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Enviando...' : 'Crear Bebida'}
+          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+            {isSubmitting ? "Enviando..." : "Crear Bebida"}
           </button>
         </form>
 
@@ -266,8 +316,8 @@ const CustomDrink = () => {
           <h3>Resumen de tu bebida:</h3>
           {previewData ? (
             <div className="preview-content">
-              <h4>{previewData.base_drink || 'Sin nombre'}</h4>
-              
+              <h4>{previewData.base_drink || "Sin nombre"}</h4>
+
               {previewData.ingredients.length > 0 ? (
                 <ul className="ingredients-list">
                   {previewData.ingredients.map((ing, idx) => (
@@ -279,9 +329,9 @@ const CustomDrink = () => {
               ) : (
                 <p>No hay ingredientes añadidos</p>
               )}
-              
+
               {previewData.ice && (
-                <p>Hielo: {previewData.ice_type || 'No especificado'}</p>
+                <p>Hielo: {previewData.ice_type || "No especificado"}</p>
               )}
             </div>
           ) : (
