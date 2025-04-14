@@ -1,0 +1,162 @@
+.orders-container {
+    min-height: 100vh;
+    background-color: #f7fafc;
+    padding: 24px;
+  }
+  
+  .orders-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #e53e3e;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  
+  .orders-table-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+  
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .orders-table th {
+    background-color: #e53e3e;
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+  }
+  
+  .orders-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .orders-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .orders-table tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .status-1 {
+    background-color: #f6e05e;
+    color: #744210;
+  }
+  
+  .status-2 {
+    background-color: #4299e1;
+    color: white;
+  }
+  
+  .status-3 {
+    background-color: #48bb78;
+    color: white;
+  }
+  
+  .status-4 {
+    background-color: #a0aec0;
+    color: white;
+  }
+  
+  .status-5 {
+    background-color: #f56565;
+    color: white;
+  }
+  
+  .details-button {
+    padding: 8px 12px;
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.3s;
+  }
+  
+  .details-button:hover {
+    background-color: #c53030;
+  }
+  
+  .loading-message,
+  .no-orders-message,
+  .error-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #4a5568;
+    margin-top: 40px;
+  }
+  
+  .error-message {
+    color: #e53e3e;
+  }
+  
+  @media (max-width: 768px) {
+    .orders-table th,
+    .orders-table td {
+      padding: 8px 10px;
+      font-size: 0.9rem;
+    }
+    
+    .details-button {
+      padding: 6px 8px;
+      font-size: 0.8rem;
+    }
+  }
+  .status-edit-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .status-select {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+  }
+  
+  .save-status-button {
+    background-color: #48bb78;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+  }
+  
+  .save-status-button:hover {
+    background-color: #38a169;
+  }
+  
+  .status-badge {
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .status-badge:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
