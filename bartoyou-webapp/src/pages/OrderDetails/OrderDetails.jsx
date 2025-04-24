@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import { FaChevronLeft } from "react-icons/fa";
+import { FaChevronLeft, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
 import "./OrderDetails.css";
 
 export default function OrderDetails() {
-  const { userId } = useParams(); // Ahora solo recibimos userId
+  const { userId } = useParams();
   const navigate = useNavigate();
-  const [orderDetails, setOrderDetails] = useState(null);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -23,17 +24,7 @@ export default function OrderDetails() {
         return response.json();
       })
       .then((data) => {
-        // Si `data` tiene los pedidos, puedes filtrar por el `orderId` si es necesario
-        const orderId = new URLSearchParams(window.location.search).get("orderId");
-
-        if (orderId) {
-          const foundOrder = data.find((order) => order.custom_drink_id === orderId);
-          if (!foundOrder) throw new Error("Pedido no encontrado");
-          setOrderDetails(foundOrder);
-        } else {
-          // Si no hay `orderId` en la URL, muestra todos los pedidos
-          setOrderDetails(data);
-        }
+        setOrders(data);
         setLoading(false);
       })
       .catch((error) => {
@@ -54,9 +45,13 @@ export default function OrderDetails() {
     return new Date(dateTime).toLocaleDateString("es-ES", options);
   };
 
-  if (loading) return <div className="loading-message">Cargando detalles del pedido...</div>;
+  const toggleOrderDetails = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
+
+  if (loading) return <div className="loading-message">Cargando pedidos...</div>;
   if (error) return <div className="error-message">{error}</div>;
-  if (!orderDetails) return <div className="no-order-message">No se encontró el pedido</div>;
+  if (!orders.length) return <div className="no-order-message">No se encontraron pedidos</div>;
 
   return (
     <div className="order-details-container">
@@ -64,33 +59,60 @@ export default function OrderDetails() {
         <FaChevronLeft /> Volver
       </button>
 
-      <h1 className="order-details-title">Detalles del Pedido</h1>
+      <h1 className="order-details-title">Historial de Pedidos</h1>
 
-      {/* Si tienes varios pedidos, puedes listarlos */}
-      {Array.isArray(orderDetails) ? (
-        orderDetails.map((order) => (
-          <div key={order.custom_drink_id} className="order-header">
-            <div className="order-meta">
-              <span className="order-id">Pedido: {order.custom_drink_id}</span>
-              <span className="order-date">{formatDateTime(order.date_time)}</span>
-              <span className={`order-status status-${order.status.toLowerCase().replace(/\s/g, "-")}`}>
-                {order.status}
-              </span>
+      <div className="orders-list">
+        {orders.map((order) => (
+          <div key={order.custom_drink_id} className="order-card">
+            <div className="order-header">
+              <div className="order-meta">
+                <span className="order-id">Pedido: {order.custom_drink_id}</span>
+                <span className="order-date">{formatDateTime(order.date_time)}</span>
+                <span className={`order-status status-${order.status.toLowerCase().replace(/\s/g, "-")}`}>
+                  {order.status}
+                </span>
+              </div>
+              
+              <button 
+                onClick={() => toggleOrderDetails(order.custom_drink_id)}
+                className="toggle-details-button"
+              >
+                {expandedOrder === order.custom_drink_id ? (
+                  <>
+                    <FaChevronUp /> Ocultar
+                  </>
+                ) : (
+                  <>
+                    <FaChevronDown /> Ver ingredientes
+                  </>
+                )}
+              </button>
             </div>
+
+            {expandedOrder === order.custom_drink_id && (
+              <div className="order-content">
+                {order.items?.map((item, index) => (
+                  <div key={index} className="order-item">
+                    <h2 className="item-name">{item.name}</h2>
+                    
+                    <div className="ingredients-section">
+                      <h3>Ingredientes:</h3>
+                      <ul className="ingredients-list">
+                        {item.ingredients?.map((ingredient, idx) => (
+                          <li key={idx} className="ingredient-item">
+                            <span className="ingredient-name">{ingredient.ingredient}</span>
+                            <span className="ingredient-amount">{ingredient.amount} ml</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ))
-      ) : (
-        // Si solo tienes un pedido específico, muestra los detalles de ese pedido
-        <div className="order-header">
-          <div className="order-meta">
-            <span className="order-id">Pedido: {orderDetails.custom_drink_id}</span>
-            <span className="order-date">{formatDateTime(orderDetails.date_time)}</span>
-            <span className={`order-status status-${orderDetails.status.toLowerCase().replace(/\s/g, "-")}`}>
-              {orderDetails.status}
-            </span>
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }
