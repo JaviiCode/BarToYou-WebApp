@@ -4,12 +4,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./OrderDetails.css";
 
 export default function OrderDetails() {
-  const { userId, orderId } = useParams(); // Ahora recibimos userId y orderId
+  const { userId } = useParams(); // Ahora solo recibimos userId
   const navigate = useNavigate();
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log("🧩 userId desde la URL:", userId);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -21,21 +21,19 @@ export default function OrderDetails() {
       .then((response) => {
         if (!response.ok) throw new Error("Error al obtener los pedidos");
         return response.json();
-        
       })
       .then((data) => {
-        console.log("📦 Data recibida:", data);
-console.log("🔍 orderId desde la URL:", orderId);
-console.log("🧪 Comparando con:", data.map(o => o.custom_drink_id?.replace("#", "")));
-        // Buscamos el pedido específico por custom_drink_id o id
-        const foundOrder = data.find((order) => {
-          const customId = order.custom_drink_id?.replace("#", "");
-          return customId === orderId;
-          
-        });
+        // Si `data` tiene los pedidos, puedes filtrar por el `orderId` si es necesario
+        const orderId = new URLSearchParams(window.location.search).get("orderId");
 
-        if (!foundOrder) throw new Error("Pedido no encontrado");
-        setOrderDetails(foundOrder);
+        if (orderId) {
+          const foundOrder = data.find((order) => order.custom_drink_id === orderId);
+          if (!foundOrder) throw new Error("Pedido no encontrado");
+          setOrderDetails(foundOrder);
+        } else {
+          // Si no hay `orderId` en la URL, muestra todos los pedidos
+          setOrderDetails(data);
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -43,8 +41,7 @@ console.log("🧪 Comparando con:", data.map(o => o.custom_drink_id?.replace("#"
         setError(error.message);
         setLoading(false);
       });
-      
-  }, [userId, orderId]);
+  }, [userId]);
 
   const formatDateTime = (dateTime) => {
     const options = {
@@ -56,15 +53,10 @@ console.log("🧪 Comparando con:", data.map(o => o.custom_drink_id?.replace("#"
     };
     return new Date(dateTime).toLocaleDateString("es-ES", options);
   };
-  
 
-  if (loading)
-    return (
-      <div className="loading-message">Cargando detalles del pedido...</div>
-    );
+  if (loading) return <div className="loading-message">Cargando detalles del pedido...</div>;
   if (error) return <div className="error-message">{error}</div>;
-  if (!orderDetails)
-    return <div className="no-order-message">No se encontró el pedido</div>;
+  if (!orderDetails) return <div className="no-order-message">No se encontró el pedido</div>;
 
   return (
     <div className="order-details-container">
@@ -74,47 +66,31 @@ console.log("🧪 Comparando con:", data.map(o => o.custom_drink_id?.replace("#"
 
       <h1 className="order-details-title">Detalles del Pedido</h1>
 
-      <div className="order-header">
-        <div className="order-meta">
-          <span className="order-id">
-            Pedido: {orderDetails.custom_drink_id || `#${orderId}`}
-          </span>
-          <span className="order-date">
-            {formatDateTime(orderDetails.date_time)}
-          </span>
-          <span
-            className={`order-status status-${orderDetails.status
-              .toLowerCase()
-              .replace(/\s/g, "-")}`}
-          >
-            {orderDetails.status}
-          </span>
-        </div>
-      </div>
-
-      <div className="order-content">
-        {orderDetails.items?.map((item, index) => (
-          <div key={index} className="order-item">
-            <h2 className="item-name">{item.name}</h2>
-
-            <div className="ingredients-section">
-              <h3>Ingredientes:</h3>
-              <ul className="ingredients-list">
-                {item.ingredients?.map((ingredient, idx) => (
-                  <li key={idx} className="ingredient-item">
-                    <span className="ingredient-name">
-                      {ingredient.ingredient}
-                    </span>
-                    <span className="ingredient-amount">
-                      {ingredient.amount} ml
-                    </span>
-                  </li>
-                ))}
-              </ul>
+      {/* Si tienes varios pedidos, puedes listarlos */}
+      {Array.isArray(orderDetails) ? (
+        orderDetails.map((order) => (
+          <div key={order.custom_drink_id} className="order-header">
+            <div className="order-meta">
+              <span className="order-id">Pedido: {order.custom_drink_id}</span>
+              <span className="order-date">{formatDateTime(order.date_time)}</span>
+              <span className={`order-status status-${order.status.toLowerCase().replace(/\s/g, "-")}`}>
+                {order.status}
+              </span>
             </div>
           </div>
-        ))}
-      </div>
+        ))
+      ) : (
+        // Si solo tienes un pedido específico, muestra los detalles de ese pedido
+        <div className="order-header">
+          <div className="order-meta">
+            <span className="order-id">Pedido: {orderDetails.custom_drink_id}</span>
+            <span className="order-date">{formatDateTime(orderDetails.date_time)}</span>
+            <span className={`order-status status-${orderDetails.status.toLowerCase().replace(/\s/g, "-")}`}>
+              {orderDetails.status}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
