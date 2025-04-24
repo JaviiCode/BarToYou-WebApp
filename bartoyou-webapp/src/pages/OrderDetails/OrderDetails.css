@@ -2,8 +2,6 @@
     min-height: 100vh;
     background-color: #f7fafc;
     padding: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
   }
   
   .back-button {
@@ -32,12 +30,28 @@
     text-align: center;
   }
   
-  .order-header {
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .order-card {
     background-color: white;
     border-radius: 8px;
-    padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    background-color: #f8f9fa;
   }
   
   .order-meta {
@@ -63,12 +77,6 @@
     border-radius: 12px;
     font-size: 0.9rem;
     font-weight: 500;
-    margin-left: auto;
-  }
-  
-  .status-pendiente {
-    background-color: #f6e05e;
-    color: #744210;
   }
   
   .status-en-preparación {
@@ -76,28 +84,34 @@
     color: white;
   }
   
-  .status-listo {
-    background-color: #48bb78;
+  .toggle-details-button {
+    padding: 8px 12px;
+    background-color: #e53e3e;
     color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.3s;
+  }
+  
+  .toggle-details-button:hover {
+    background-color: #c53030;
   }
   
   .order-content {
-    background-color: white;
-    border-radius: 8px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    padding: 0 20px;
+  }
+  
+  .order-content.show {
+    max-height: 1000px; /* Ajusta este valor según necesites */
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .order-item {
-    margin-bottom: 30px;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 20px;
-  }
-  
-  .order-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+    transition: max-height 0.5s ease-in, padding 0.3s ease;
   }
   
   .item-name {
@@ -149,75 +163,6 @@
   .error-message {
     color: #e53e3e;
   }
-  .orders-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .order-card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-  }
-  
-  .order-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    cursor: pointer;
-    background-color: #f8f9fa;
-  }
-  
-  .toggle-details-button {
-    padding: 8px 12px;
-    background-color: #e53e3e;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: background-color 0.3s;
-  }
-  
-  .toggle-details-button:hover {
-    background-color: #c53030;
-  }
-  
-  .order-content {
-    padding: 0 20px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out, padding 0.3s ease;
-  }
-  
-  .order-card.active .order-content {
-    padding: 20px;
-    max-height: 1000px; /* Ajusta según necesites */
-  }
-  
-  .ingredients-list {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 12px;
-    margin-top: 10px;
-  }
-  
-  .ingredient-item {
-    background-color: #f8f9fa;
-    padding: 12px 15px;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-  }
   
   @media (max-width: 768px) {
     .order-header {
@@ -229,21 +174,6 @@
     .toggle-details-button {
       width: 100%;
       justify-content: center;
-    }
-    
-    .ingredients-list {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .order-meta {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    
-    .order-status {
-      margin-left: 0;
     }
     
     .ingredients-list {

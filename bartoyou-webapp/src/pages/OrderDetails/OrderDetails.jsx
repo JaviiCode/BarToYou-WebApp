@@ -63,7 +63,10 @@ export default function OrderDetails() {
 
       <div className="orders-list">
         {orders.map((order) => (
-          <div key={order.custom_drink_id} className="order-card">
+          <div 
+            key={order.custom_drink_id} 
+            className={`order-card ${expandedOrder === order.custom_drink_id ? 'expanded' : ''}`}
+          >
             <div className="order-header">
               <div className="order-meta">
                 <span className="order-id">Pedido: {order.custom_drink_id}</span>
@@ -89,27 +92,25 @@ export default function OrderDetails() {
               </button>
             </div>
 
-            {expandedOrder === order.custom_drink_id && (
-              <div className="order-content">
-                {order.items?.map((item, index) => (
-                  <div key={index} className="order-item">
-                    <h2 className="item-name">{item.name}</h2>
-                    
-                    <div className="ingredients-section">
-                      <h3>Ingredientes:</h3>
-                      <ul className="ingredients-list">
-                        {item.ingredients?.map((ingredient, idx) => (
-                          <li key={idx} className="ingredient-item">
-                            <span className="ingredient-name">{ingredient.ingredient}</span>
-                            <span className="ingredient-amount">{ingredient.amount} ml</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+            <div className={`order-content ${expandedOrder === order.custom_drink_id ? 'show' : ''}`}>
+              {order.items?.map((item, index) => (
+                <div key={index} className="order-item">
+                  <h2 className="item-name">{item.name}</h2>
+                  
+                  <div className="ingredients-section">
+                    <h3>Ingredientes:</h3>
+                    <ul className="ingredients-list">
+                      {item.ingredients?.map((ingredient, idx) => (
+                        <li key={idx} className="ingredient-item">
+                          <span className="ingredient-name">{ingredient.ingredient}</span>
+                          <span className="ingredient-amount">{ingredient.amount} ml</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
