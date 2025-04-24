@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { FaInfoCircle, FaSave } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "./Orders.css";
 
 const API_BASE = "http://127.0.0.1:8000/api/bartoyou";
 
 export default function Orders() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -130,7 +132,9 @@ export default function Orders() {
                   <td>
                     {order.custom_drink_id
                       ? `Bebida Personalizada ${order.custom_drink_id}`
-                      : `Bebida #${order.consumption_id || order.consumption_recipe_id}`}
+                      : `Bebida #${
+                          order.consumption_id || order.consumption_recipe_id
+                        }`}
                   </td>
                   <td>{formatDateTime(order.date_time)}</td>
                   <td>{order.quantity}</td>
@@ -162,15 +166,22 @@ export default function Orders() {
                         className={`status-badge status-${order.status_id}`}
                         onClick={() => startEditing(order.id)}
                       >
-                        {
-                          statuses.find((s) => s.id === order.status_id)?.name ||
-                          `Estado ${order.status_id}`
-                        }
+                        {statuses.find((s) => s.id === order.status_id)?.name ||
+                          `Estado ${order.status_id}`}
                       </span>
                     )}
                   </td>
                   <td>
-                    <button className="details-button" onClick={() => {}}>
+                    <button
+                      className="details-button"
+                      onClick={() => {
+                        const orderIdentifier =
+                          order.custom_drink_id?.replace("#", "") || order.id;
+                        navigate(
+                          `/orders/${order.member_id}`
+                        );
+                      }}
+                    >
                       <FaInfoCircle /> Detalles
                     </button>
                   </td>
