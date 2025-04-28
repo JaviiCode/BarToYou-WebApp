@@ -16,39 +16,34 @@ export default function OrderDetails() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // Cargar pedidos
-    fetch(`http://127.0.0.1:8000/api/orders/user/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Error al obtener los pedidos");
-        return response.json();
-      })
-      .then((data) => {
-        setOrders(data);
-        
-        // Cargar estados disponibles
-        return fetch("http://127.0.0.1:8000/api/bartoyou/order-statuses", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    // Cargar pedidos y estados
+    const fetchData = async () => {
+      try {
+        // Obtener pedidos
+        const ordersResponse = await fetch(`http://127.0.0.1:8000/api/orders/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-      })
-      .then(response => {
-        if (!response.ok) throw new Error("Error al obtener los estados");
-        return response.json();
-      })
-      .then(data => {
-        setStatuses(data.data || data);
-        setLoading(false);
-      })
-      .catch((error) => {
+        if (!ordersResponse.ok) throw new Error("Error al obtener pedidos");
+        const ordersData = await ordersResponse.json();
+        
+        // Obtener estados
+        const statusesResponse = await fetch("http://127.0.0.1:8000/api/bartoyou/order-statuses", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!statusesResponse.ok) throw new Error("Error al obtener estados");
+        const statusesData = await statusesResponse.json();
+
+        setOrders(ordersData);
+        setStatuses(statusesData.data || statusesData);
+      } catch (error) {
         console.error("Error:", error);
         setError(error.message);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, [userId]);
 
   const formatDateTime = (dateTime) => {
@@ -68,39 +63,44 @@ export default function OrderDetails() {
 
   const handleStatusChange = (orderId, newStatusId) => {
     setOrders(orders.map(order => 
-      order.custom_drink_id === orderId ? { ...order, status_id: parseInt(newStatusId) } : order
+      order.orderid === orderId ? { ...order, status_id: parseInt(newStatusId) } : order
     ));
   };
 
   const saveStatusChange = async (orderId) => {
     const token = localStorage.getItem("token");
-    const orderToUpdate = orders.find(order => order.custom_drink_id === orderId);
+    const orderToUpdate = orders.find(order => order.orderid === orderId);
     
+    if (!orderToUpdate) {
+      setError("Pedido no encontrado");
+      return;
+    }
+
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/orders/${orderToUpdate.id}/status`, {
-        method: 'PUT',
+      const response = await fetch(`http://127.0.0.1:8000/api/bartoyou/orders/${orderId}`, {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           status_id: orderToUpdate.status_id
-        })
+        }),
       });
 
-      if (!response.ok) throw new Error("Error al actualizar el estado");
-
-      const result = await response.json();
-      if (result.success) {
-        setEditingStatus(null);
-        // Opcional: recargar los pedidos
-        // fetchOrders();
-      } else {
-        throw new Error("Error en la respuesta del servidor");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al actualizar el estado");
       }
+
+      setEditingStatus(null);
+      // Actualización optimista
+      setOrders(orders.map(order => 
+        order.orderid === orderId ? { ...order, status: statuses.find(s => s.id === order.status_id)?.name } : order
+      ));
     } catch (error) {
-      console.error("Error al guardar:", error);
-      setError("Error al actualizar el estado: " + error.message);
+      console.error("Error:", error);
+      setError("Error al actualizar: " + error.message);
       // Revertir cambios
       setOrders([...orders]);
     }
@@ -125,19 +125,19 @@ export default function OrderDetails() {
       <div className="orders-list">
         {orders.map((order) => (
           <div 
-            key={order.custom_drink_id} 
-            className={`order-card ${expandedOrder === order.custom_drink_id ? 'expanded' : ''}`}
+            key={order.orderid} 
+            className={`order-card ${expandedOrder === order.orderid ? 'expanded' : ''}`}
           >
             <div className="order-header">
               <div className="order-meta">
                 <span className="order-id">Pedido: {order.custom_drink_id}</span>
                 <span className="order-date">{formatDateTime(order.date_time)}</span>
                 
-                {editingStatus === order.custom_drink_id ? (
+                {editingStatus === order.orderid ? (
                   <div className="status-edit-container">
                     <select
-                      value={order.status_id}
-                      onChange={(e) => handleStatusChange(order.custom_drink_id, e.target.value)}
+                      value={order.status_id || statuses.find(s => s.name === order.status)?.id}
+                      onChange={(e) => handleStatusChange(order.orderid, e.target.value)}
                       className="status-select"
                     >
                       {statuses.map(status => (
@@ -147,27 +147,27 @@ export default function OrderDetails() {
                       ))}
                     </select>
                     <button 
-                      onClick={() => saveStatusChange(order.custom_drink_id)}
+                      onClick={() => saveStatusChange(order.orderid)}
                       className="save-status-button"
                     >
-                      <FaSave />
+                      <FaSave /> Guardar
                     </button>
                   </div>
                 ) : (
                   <span 
                     className={`order-status status-${order.status.toLowerCase().replace(/\s/g, '-')}`}
-                    onClick={() => startEditing(order.custom_drink_id)}
+                    onClick={() => startEditing(order.orderid)}
                   >
-                    {statuses.find(s => s.id === order.status_id)?.name || order.status}
+                    {order.status}
                   </span>
                 )}
               </div>
               
               <button 
-                onClick={() => toggleOrderDetails(order.custom_drink_id)}
+                onClick={() => toggleOrderDetails(order.orderid)}
                 className="toggle-details-button"
               >
-                {expandedOrder === order.custom_drink_id ? (
+                {expandedOrder === order.orderid ? (
                   <>
                     <FaChevronUp /> Ocultar
                   </>
@@ -179,7 +179,7 @@ export default function OrderDetails() {
               </button>
             </div>
 
-            <div className={`order-content ${expandedOrder === order.custom_drink_id ? 'show' : ''}`}>
+            <div className={`order-content ${expandedOrder === order.orderid ? 'show' : ''}`}>
               {order.items?.map((item, index) => (
                 <div key={index} className="order-item">
                   <h2 className="item-name">{item.name}</h2>
