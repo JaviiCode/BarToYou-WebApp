@@ -7,29 +7,35 @@ const API_BASE = "http://127.0.0.1:8000/api/bartoyou";
 
 export default function Orders() {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
+  const [showCompleted, setShowCompleted] = useState(false);
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const ordersRes = await fetch(`${API_BASE}/orders`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!ordersRes.ok) throw new Error("Error al obtener los pedidos");
-        const ordersData = await ordersRes.json();
-        setOrders(ordersData.data || ordersData);
+        const [ordersRes, statusesRes] = await Promise.all([
+          fetch(`${API_BASE}/orders`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_BASE}/order-statuses`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        ]);
 
-        const statusesRes = await fetch(`${API_BASE}/order-statuses`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        if (!ordersRes.ok) throw new Error("Error al obtener los pedidos");
         if (!statusesRes.ok) throw new Error("Error al obtener los estados");
+
+        const ordersData = await ordersRes.json();
         const statusesData = await statusesRes.json();
+
+        setAllOrders(ordersData.data || ordersData);
         setStatuses(statusesData.data || statusesData);
       } catch (err) {
         setError(err.message);
@@ -41,6 +47,14 @@ export default function Orders() {
     fetchData();
   }, [token]);
 
+  // Filtramos los pedidos según el estado
+  useEffect(() => {
+    const activeOrders = allOrders.filter(order => {
+      return showCompleted ? true : order.status_id !== 3;
+    });
+    setFilteredOrders(activeOrders);
+  }, [allOrders, showCompleted]);
+
   const formatDateTime = (dateTime) =>
     new Date(dateTime).toLocaleString("es-ES", {
       year: "numeric",
@@ -51,8 +65,8 @@ export default function Orders() {
     });
 
   const handleStatusChange = (orderId, newStatusId) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
+    setAllOrders(prevOrders =>
+      prevOrders.map(order =>
         order.id === orderId
           ? { ...order, status_id: parseInt(newStatusId) }
           : order
@@ -61,42 +75,38 @@ export default function Orders() {
   };
 
   const saveStatusChange = async (orderId) => {
-    const orderToUpdate = orders.find((o) => o.id === orderId);
+    const orderToUpdate = allOrders.find((o) => o.id === orderId);
     if (!orderToUpdate) return;
 
-    const url = `${API_BASE}/orders/${orderId}`;
-    console.log("Actualizando pedido en:", url);
-
     try {
-      const response = await fetch(url, {
+      const response = await fetch(`${API_BASE}/orders/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          member_id: orderToUpdate.member_id,
-          consumption_recipe_id: orderToUpdate.consumption_recipe_id,
-          consumption_id: orderToUpdate.consumption_id,
-          date_time: orderToUpdate.date_time,
-          quantity: orderToUpdate.quantity,
-          custom_drink_id: orderToUpdate.custom_drink_id,
-          status_id: orderToUpdate.status_id,
+          ...orderToUpdate, // Envía todos los campos
+          status_id: orderToUpdate.status_id // Asegura el nuevo estado
         }),
       });
 
-      if (!response.ok) throw new Error("Error al actualizar el estado");
-
-      const result = await response.json();
-      if (result.success || response.status === 200) {
-        setEditingStatus(null);
-        alert("Estado actualizado correctamente");
-      } else {
-        throw new Error("Respuesta inválida del servidor");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al actualizar el estado");
       }
+
+      // Actualización optimista
+      const updatedOrders = allOrders.map(order => 
+        order.id === orderId ? orderToUpdate : order
+      );
+
+      setAllOrders(updatedOrders);
+      setEditingStatus(null);
     } catch (err) {
       console.error("Error al guardar:", err);
       setError("Error al actualizar el estado: " + err.message);
+      setAllOrders([...allOrders]); // Revertir cambios
     }
   };
 
@@ -106,11 +116,23 @@ export default function Orders() {
     <div className="orders-container">
       <h1 className="orders-title">Pedidos Recientes</h1>
 
+      {/* Toggle para mostrar/ocultar completados */}
+      <div className="toggle-completed">
+        <label>
+          <input 
+            type="checkbox" 
+            checked={showCompleted}
+            onChange={() => setShowCompleted(!showCompleted)} 
+          />
+          Mostrar pedidos finalizados
+        </label>
+      </div>
+
       {loading ? (
         <p className="loading-message">Cargando pedidos...</p>
       ) : error ? (
         <p className="error-message">{error}</p>
-      ) : orders.length === 0 ? (
+      ) : filteredOrders.length === 0 ? (
         <p className="no-orders-message">No hay pedidos registrados</p>
       ) : (
         <div className="orders-table-container">
@@ -126,15 +148,13 @@ export default function Orders() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.id}>
                   <td>{order.id}</td>
                   <td>
                     {order.custom_drink_id
                       ? `Bebida Personalizada ${order.custom_drink_id}`
-                      : `Bebida #${
-                          order.consumption_id || order.consumption_recipe_id
-                        }`}
+                      : `Bebida #${order.consumption_id || order.consumption_recipe_id}`}
                   </td>
                   <td>{formatDateTime(order.date_time)}</td>
                   <td>{order.quantity}</td>
@@ -143,9 +163,7 @@ export default function Orders() {
                       <div className="status-edit-container">
                         <select
                           value={order.status_id}
-                          onChange={(e) =>
-                            handleStatusChange(order.id, e.target.value)
-                          }
+                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
                           className="status-select"
                         >
                           {statuses.map((status) => (
@@ -175,11 +193,8 @@ export default function Orders() {
                     <button
                       className="details-button"
                       onClick={() => {
-                        const orderIdentifier =
-                          order.custom_drink_id?.replace("#", "") || order.id;
-                        navigate(
-                          `/orders/${order.member_id}`
-                        );
+                        const orderIdentifier = order.custom_drink_id?.replace("#", "") || order.id;
+                        navigate(`/orders/${order.member_id}`);
                       }}
                     >
                       <FaInfoCircle /> Detalles
