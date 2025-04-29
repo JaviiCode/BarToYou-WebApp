@@ -242,3 +242,191 @@
     width: 18px;
     height: 18px;
   }
+  .item-description {
+    color: #4a5568;
+    margin: 10px 0;
+    font-size: 0.9rem;
+  }
+  
+  .item-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 10px 0;
+    object-fit: cover;
+  }
+  
+  /* Estilo para bebidas estándar */
+  .standard-drink {
+    background-color: #f0fdf4;
+    border-left: 4px solid #10b981;
+  }
+  
+  /* Estilo para bebidas personalizadas */
+  .custom-drink {
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
+  }
+  /* Estilos para el contenedor principal */
+.order-item {
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilos diferenciados por tipo de bebida */
+.custom-drink {
+  border-left: 4px solid #3b82f6;
+}
+
+.standard-drink {
+  border-left: 4px solid #10b981;
+}
+
+/* Encabezado del item */
+.item-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.item-name {
+  font-size: 1.2rem;
+  color: #2d3748;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.custom-badge {
+  background-color: #3b82f6;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/* Contenedor de imagen principal */
+.item-image-container {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Descripción */
+.item-description {
+  color: #4a5568;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+
+/* Sección de ingredientes */
+.ingredients-section {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.ingredients-title {
+  font-size: 1rem;
+  color: #2d3748;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.ingredients-title span {
+  background-color: #f7fafc;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+/* Lista de ingredientes */
+.ingredients-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.ingredient-item {
+  background-color: #f8fafc;
+  padding: 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ingredient-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ingredient-image {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ingredient-name {
+  font-weight: 500;
+}
+
+.ingredient-amount {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+/* Detalles adicionales */
+.item-details {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.alcoholic-badge {
+  display: inline-block;
+  background-color: #f6ad55;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .item-header {
+    flex-direction: column;
+  }
+  
+  .item-image-container {
+    width: 100%;
+    height: 150px;
+  }
+  
+  .ingredients-list {
+    grid-template-columns: 1fr;
+  }
+}

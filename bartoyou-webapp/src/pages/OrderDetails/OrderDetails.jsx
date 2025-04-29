@@ -13,7 +13,7 @@ export default function OrderDetails() {
   const [error, setError] = useState(null);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
-  const [showCompleted, setShowCompleted] = useState(false); // Opcional: toggle para mostrar completados
+  const [showCompleted, setShowCompleted] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -48,11 +48,10 @@ export default function OrderDetails() {
     fetchData();
   }, [userId]);
 
-  // Filtramos los pedidos según el estado
   useEffect(() => {
     const activeOrders = allOrders.filter(order => {
       const statusId = statuses.find(s => s.name === order.status)?.id;
-      return showCompleted ? true : statusId !== 3; // Si showCompleted es true, mostramos todos
+      return showCompleted ? true : statusId !== 3;
     });
     setFilteredOrders(activeOrders);
   }, [allOrders, statuses, showCompleted]);
@@ -82,11 +81,6 @@ export default function OrderDetails() {
     const token = localStorage.getItem("token");
     const orderToUpdate = allOrders.find(order => order.orderid === orderId);
     
-    if (!orderToUpdate) {
-      setError("Pedido no encontrado");
-      return;
-    }
-
     try {
       const response = await fetch(`http://127.0.0.1:8000/api/bartoyou/orders/${orderId}`, {
         method: "PUT",
@@ -99,12 +93,8 @@ export default function OrderDetails() {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al actualizar el estado");
-      }
+      if (!response.ok) throw new Error("Error al actualizar el estado");
 
-      // Actualización optimista
       const updatedOrders = allOrders.map(order => 
         order.orderid === orderId ? { 
           ...order, 
@@ -117,12 +107,57 @@ export default function OrderDetails() {
     } catch (error) {
       console.error("Error:", error);
       setError("Error al actualizar: " + error.message);
-      setAllOrders([...allOrders]); // Revertir cambios
+      setAllOrders([...allOrders]);
     }
   };
 
   const startEditing = (orderId) => {
     setEditingStatus(orderId);
+  };
+
+  const renderOrderContent = (order) => {
+    return order.items?.map((item, index) => (
+      <div 
+        key={index} 
+        className={`order-item ${order.custom_drink_id ? 'custom-drink' : 'standard-drink'}`}
+      >
+        {/* Encabezado con nombre y tipo de bebida */}
+        <div className="item-header">
+          <h2 className="item-name">
+            {item.name}
+            {order.custom_drink_id}
+          </h2>
+          
+        </div>
+  
+        {/* Ingredientes (solo para bebidas personalizadas) */}
+        {item.ingredients?.length > 0 && (
+          <div className="ingredients-section">
+            <h3 className="ingredients-title">
+              <span>Ingredientes</span>
+            </h3>
+            <ul className="ingredients-list">
+              {item.ingredients.map((ingredient, idx) => (
+                <li key={idx} className="ingredient-item">
+                  <div className="ingredient-info">
+                    {ingredient.image_url && (
+                      <img 
+                        src={ingredient.image_url} 
+                        alt={ingredient.ingredient}
+                        className="ingredient-image"
+                        onError={(e) => e.target.style.display = 'none'}
+                      />
+                    )}
+                    <span className="ingredient-name">{ingredient.ingredient}</span>
+                  </div>
+                  <span className="ingredient-amount">{ingredient.amount} ml</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    ));
   };
 
   if (loading) return <div className="loading-message">Cargando pedidos...</div>;
@@ -137,7 +172,6 @@ export default function OrderDetails() {
 
       <h1 className="order-details-title">Historial de Pedidos</h1>
 
-      {/* Opcional: Toggle para mostrar/ocultar completados */}
       <div className="toggle-completed">
         <label>
           <input 
@@ -152,6 +186,7 @@ export default function OrderDetails() {
       <div className="orders-list">
         {filteredOrders.map((order) => {
           const statusId = statuses.find(s => s.name === order.status)?.id;
+          const isCustom = order.custom_drink_id !== null;
           
           return (
             <div 
@@ -160,7 +195,9 @@ export default function OrderDetails() {
             >
               <div className="order-header">
                 <div className="order-meta">
-                  <span className="order-id">Pedido: {order.custom_drink_id}</span>
+                  <span className="order-id">
+                    {isCustom ? `Bebida Personalizada ${order.custom_drink_id}` : `Pedido #${order.orderid}`}
+                  </span>
                   <span className="order-date">{formatDateTime(order.date_time)}</span>
                   
                   {editingStatus === order.orderid ? (
@@ -203,30 +240,14 @@ export default function OrderDetails() {
                     </>
                   ) : (
                     <>
-                      <FaChevronDown /> Ver ingredientes
+                      <FaChevronDown /> Ver detalles
                     </>
                   )}
                 </button>
               </div>
 
               <div className={`order-content ${expandedOrder === order.orderid ? 'show' : ''}`}>
-                {order.items?.map((item, index) => (
-                  <div key={index} className="order-item">
-                    <h2 className="item-name">{item.name}</h2>
-                    
-                    <div className="ingredients-section">
-                      <h3>Ingredientes:</h3>
-                      <ul className="ingredients-list">
-                        {item.ingredients?.map((ingredient, idx) => (
-                          <li key={idx} className="ingredient-item">
-                            <span className="ingredient-name">{ingredient.ingredient}</span>
-                            <span className="ingredient-amount">{ingredient.amount} ml</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ))}
+                {renderOrderContent(order)}
               </div>
             </div>
           );
