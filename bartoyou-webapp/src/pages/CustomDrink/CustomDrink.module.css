@@ -1,0 +1,198 @@
+.customDrinkPage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.pageTitle {
+  color: #e53e3e;
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.formContainer {
+  display: flex;
+  gap: 30px;
+  justify-content: space-between;
+}
+
+.drinkForm {
+  flex: 1;
+  max-width: 500px;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.previewContainer {
+  flex: 1;
+  max-width: 500px;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  align-self: flex-start;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.formGroup select,
+.formGroup input[type="number"],
+.formGroup input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.ingredientRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ingredientRow select {
+  flex: 2;
+}
+
+.ingredientRow input {
+  flex: 1;
+}
+
+.ingredientRow span {
+  flex: 0.5;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.removeBtn {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.removeBtn:hover {
+  background: #c53030;
+}
+
+.addIngredientBtn {
+  background: none;
+  border: 1px dashed #e53e3e;
+  color: #e53e3e;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  margin-top: 10px;
+}
+
+.addIngredientBtn:hover {
+  background: #fef2f2;
+}
+
+.submitBtn {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.submitBtn:hover {
+  background-color: #c53030;
+}
+
+.submitBtn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.previewContent {
+  margin-top: 15px;
+}
+
+.previewContent h4 {
+  color: #e53e3e;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.ingredientsList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+
+.ingredientsList li {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.loadingMessage {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  margin-top: 50px;
+}
+
+.ingredientRow select option {
+  padding: 5px;
+}
+
+.ingredientRow select option:disabled {
+  color: #999;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .formContainer {
+    flex-direction: column;
+  }
+  
+  .drinkForm,
+  .previewContainer {
+    max-width: 100%;
+  }
+  
+  .ingredientRow {
+    flex-wrap: wrap;
+  }
+  
+  .ingredientRow select,
+  .ingredientRow input {
+    flex: 100%;
+    margin-bottom: 5px;
+  }
+}

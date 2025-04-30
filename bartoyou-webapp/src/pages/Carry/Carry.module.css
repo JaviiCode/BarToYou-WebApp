@@ -1,0 +1,213 @@
+.carryContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.carryTitle {
+  color: #e53e3e;
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cartItemsContainer {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cartItemsList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.cartItem {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+  gap: 15px;
+}
+
+.cartItem:last-child {
+  border-bottom: none;
+}
+
+.itemImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.itemImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemDetails {
+  flex-grow: 1;
+}
+
+.itemDetails h3 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.itemDetails p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.itemActions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.removeBtn, .editBtn, .saveQuantityBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.removeBtn {
+  color: #e53e3e;
+}
+
+.removeBtn:hover {
+  color: #c53030;
+  transform: scale(1.1);
+}
+
+.editBtn {
+  color: #3182ce;
+}
+
+.editBtn:hover {
+  color: #2c5282;
+  transform: scale(1.1);
+}
+
+.saveQuantityBtn {
+  color: #38a169;
+  background: #f0fff4;
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.saveQuantityBtn:hover {
+  color: #2f855a;
+  transform: scale(1.05);
+}
+
+.quantityEdit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.quantityEdit input {
+  width: 60px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.quantityEdit input:focus {
+  outline: none;
+  border-color: #3182ce;
+}
+
+.cartSummary {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.placeOrderBtn {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.placeOrderBtn:hover {
+  background-color: #c53030;
+}
+
+.placeOrderBtn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.emptyCartMessage {
+  text-align: center;
+  color: #666;
+  font-size: 1.2rem;
+  padding: 40px 0;
+}
+
+@media (max-width: 768px) {
+  .cartItem {
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: relative;
+    padding-bottom: 40px;
+  }
+  
+  .itemActions {
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+  }
+  
+  .quantityEdit {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .placeOrderBtn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .carryTitle {
+    font-size: 2rem;
+  }
+  
+  .cartItem {
+    gap: 10px;
+  }
+  
+  .itemImage {
+    width: 60px;
+    height: 60px;
+  }
+}

@@ -1,0 +1,335 @@
+.clientOrderContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+.backButton {
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 30px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.backButton:hover {
+  background-color: #c53030;
+}
+
+.title {
+  color: #e53e3e;
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.orderCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.orderIdStatus {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.orderId {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.toggleOrderButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 1rem;
+  padding: 5px;
+}
+
+.orderDate {
+  color: #666;
+  font-size: 0.85rem;
+  margin: 15px 0;
+  text-align: right;
+}
+
+.progressTracker {
+  margin: 25px 0;
+}
+
+.progressBar {
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #e53e3e;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.progressSteps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.stepIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #999;
+  font-size: 0.6rem;
+  margin-bottom: 5px;
+}
+
+.active .stepIcon {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.stepLabel {
+  font-size: 0.65rem;
+  color: #999;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.active .stepLabel {
+  color: #333;
+  font-weight: bold;
+}
+
+.orderItems {
+  margin: 20px 0;
+}
+
+.orderItem {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.itemHeader {
+  padding: 12px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.itemInfo h3 {
+  margin: 0;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.toggleDetailsButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 0.9rem;
+  padding: 5px;
+}
+
+.itemDetails {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: #fafafa;
+}
+
+.expanded {
+  max-height: 1000px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+.itemImage {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.itemDescription {
+  color: #666;
+  margin: 10px 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.ingredientsSection h4 {
+  margin: 15px 0 8px;
+  color: #333;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ingredientsSection ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredientsSection li {
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.actionButtons {
+  margin: 20px 0 10px;
+  text-align: center;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: #e53e3e;
+  border: 1px solid #e53e3e;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  transition: all 0.3s;
+}
+
+.cancelButton:hover {
+  background-color: #fef2f2;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.statusPendiente {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.statusEnPreparacion {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.statusListo {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.statusEntregado {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.statusCancelado {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.loadingMessage,
+.errorMessage,
+.noOrderMessage {
+  text-align: center;
+  padding: 50px 20px;
+  font-size: 1.1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.errorMessage {
+  color: #e53e3e;
+}
+
+.noOrderMessage {
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .clientOrderContainer {
+    padding: 15px;
+  }
+  
+  .orderIdStatus {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .progressSteps {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .step {
+    flex: none;
+    width: calc(50% - 5px);
+  }
+}
