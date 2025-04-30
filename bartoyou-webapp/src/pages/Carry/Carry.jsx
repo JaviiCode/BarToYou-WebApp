@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import './Carry.css';
+import styles from './Carry.module.css';
 import { FaTrash, FaEdit, FaCheck } from 'react-icons/fa';
 
 const Carry = () => {
@@ -106,24 +106,24 @@ const Carry = () => {
   };
 
   return (
-    <div className="carry-container">
-      <h1 className="carry-title">Mi Carrito</h1>
+    <div className={styles.carryContainer}>
+      <h1 className={styles.carryTitle}>Mi Carrito</h1>
       
-      <div className="cart-items-container">
+      <div className={styles.cartItemsContainer}>
         {cartItems.length > 0 ? (
           <>
-            <ul className="cart-items-list">
+            <ul className={styles.cartItemsList}>
               {cartItems.map((item) => (
-                <li key={item.id} className="cart-item">
+                <li key={item.id} className={styles.cartItem}>
                   {item.image && (
-                    <div className="item-image">
+                    <div className={styles.itemImage}>
                       <img src={item.image} alt={item.name} />
                     </div>
                   )}
-                  <div className="item-details">
+                  <div className={styles.itemDetails}>
                     <h3>{item.name}</h3>
                     {editingItem === item.id ? (
-                      <div className="quantity-edit">
+                      <div className={styles.quantityEdit}>
                         <input
                           type="number"
                           min="1"
@@ -133,7 +133,7 @@ const Carry = () => {
                         />
                         <button 
                           onClick={handleSaveQuantity}
-                          className="save-quantity-btn"
+                          className={styles.saveQuantityBtn}
                         >
                           <FaCheck />
                         </button>
@@ -142,16 +142,16 @@ const Carry = () => {
                       <p>Cantidad: {item.quantity}</p>
                     )}
                   </div>
-                  <div className="item-actions">
+                  <div className={styles.itemActions}>
                     <button 
                       onClick={() => handleEditQuantity(item)}
-                      className="edit-btn"
+                      className={styles.editBtn}
                     >
                       <FaEdit />
                     </button>
                     <button 
                       onClick={() => handleRemoveItem(item.id)}
-                      className="remove-btn"
+                      className={styles.removeBtn}
                     >
                       <FaTrash />
                     </button>
@@ -160,10 +160,10 @@ const Carry = () => {
               ))}
             </ul>
             
-            <div className="cart-summary">
+            <div className={styles.cartSummary}>
               <button 
                 onClick={handlePlaceOrder}
-                className="place-order-btn"
+                className={styles.placeOrderBtn}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Procesando...' : 'Realizar Pedido'}
@@ -171,7 +171,7 @@ const Carry = () => {
             </div>
           </>
         ) : (
-          <p className="empty-cart-message">Tu carrito está vacío</p>
+          <p className={styles.emptyCartMessage}>Tu carrito está vacío</p>
         )}
       </div>
     </div>

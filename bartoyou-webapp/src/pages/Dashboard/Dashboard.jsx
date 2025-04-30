@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Card from "../../components/Card/Card";
-import './Dashboard.css';
+import styles from './Dashboard.module.css';
 import { useNavigate } from 'react-router-dom';
 
-// Importamos las imágenes desde assets/icons
 import menuIcon from "../../assets/icons/menu.png";
 import customIcon from "../../assets/icons/custom.png";
 // import ordersIcon from "../../assets/icons/orders.png";
@@ -26,7 +25,6 @@ function Dashboard() {
     const role = authData?.user?.role;
     setUserRole(role);
 
-    // Cards para Cliente
     const clientCards = [
       {
         title: 'Menú',
@@ -42,7 +40,6 @@ function Dashboard() {
       }
     ];
 
-    // Cards para Camarero/Admin
     const staffCards = [
       {
         title: 'Listado de Pedidos',
@@ -52,7 +49,6 @@ function Dashboard() {
       },
     ];
 
-    // Cards adicionales solo para Admin
     const adminCards = [
       {
         title: 'Estadísticas',
@@ -74,7 +70,6 @@ function Dashboard() {
       }
     ];
 
-    // Determinar qué cards mostrar según el rol
     if (role === 'Admin' || role === 'Administrador') {
       setCards([...staffCards, ...adminCards]);
     } else if (role === 'camarero') {
@@ -85,13 +80,12 @@ function Dashboard() {
   }, [navigate]);
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
+    <div className={styles.dashboardContainer}>
+      <div className={styles.dashboardHeader}>
         <h1>Brand You Agency</h1>
-        <p className="user-role">Rol: {userRole?.toUpperCase() || 'No identificado'}</p>
       </div>
 
-      <div className="cards-container">
+      <div className={styles.cardsContainer}>
         {cards.map((card, index) => (
           <Card
             key={index}

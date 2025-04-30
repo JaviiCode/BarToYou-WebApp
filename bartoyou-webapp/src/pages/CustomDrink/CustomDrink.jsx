@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./CustomDrink.css";
+import styles from "./CustomDrink.module.css";
 
 const CustomDrink = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -193,20 +193,20 @@ const CustomDrink = () => {
 
   if (isLoading) {
     return (
-      <div className="custom-drink-page">
-        <h1 className="page-title">Crear Bebida Personalizada</h1>
-        <div className="loading-message">Cargando datos...</div>
+      <div className={styles.customDrinkPage}>
+        <h1 className={styles.pageTitle}>Crear Bebida Personalizada</h1>
+        <div className={styles.loadingMessage}>Cargando datos...</div>
       </div>
     );
   }
 
   return (
-    <div className="custom-drink-page">
-      <h1 className="page-title">Crear Bebida Personalizada</h1>
+    <div className={styles.customDrinkPage}>
+      <h1 className={styles.pageTitle}>Crear Bebida Personalizada</h1>
 
-      <div className="form-container">
-        <form onSubmit={handleSubmit} className="drink-form">
-          <div className="form-group">
+      <div className={styles.formContainer}>
+        <form onSubmit={handleSubmit} className={styles.drinkForm}>
+          <div className={styles.formGroup}>
             <label>Bebida Base:</label>
             <select
               value={formData.base_drink_id || ""}
@@ -222,10 +222,10 @@ const CustomDrink = () => {
             </select>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Ingredientes:</label>
             {formData.ingredients.map((ingredient, index) => (
-              <div key={index} className="ingredient-row">
+              <div key={index} className={styles.ingredientRow}>
                 <select
                   value={ingredient.ingredient_id || ""}
                   onChange={(e) =>
@@ -261,7 +261,7 @@ const CustomDrink = () => {
                 <button
                   type="button"
                   onClick={() => handleRemoveIngredient(index)}
-                  className="remove-btn"
+                  className={styles.removeBtn}
                 >
                   ×
                 </button>
@@ -271,13 +271,13 @@ const CustomDrink = () => {
             <button
               type="button"
               onClick={handleAddIngredient}
-              className="add-ingredient-btn"
+              className={styles.addIngredientBtn}
             >
               + Añadir Ingrediente
             </button>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>
               <input
                 type="checkbox"
@@ -291,7 +291,7 @@ const CustomDrink = () => {
           </div>
 
           {formData.ice && (
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Tipo de hielo:</label>
               <select
                 value={formData.ice_type}
@@ -307,19 +307,19 @@ const CustomDrink = () => {
             </div>
           )}
 
-          <button type="submit" className="submit-btn" disabled={isSubmitting}>
+          <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
             {isSubmitting ? "Enviando..." : "Crear Bebida"}
           </button>
         </form>
 
-        <div className="preview-container">
+        <div className={styles.previewContainer}>
           <h3>Resumen de tu bebida:</h3>
           {previewData ? (
-            <div className="preview-content">
+            <div className={styles.previewContent}>
               <h4>{previewData.base_drink || "Sin nombre"}</h4>
 
               {previewData.ingredients.length > 0 ? (
-                <ul className="ingredients-list">
+                <ul className={styles.ingredientsList}>
                   {previewData.ingredients.map((ing, idx) => (
                     <li key={idx}>
                       {ing.amount} {ing.unit} de {ing.ingredient_name}

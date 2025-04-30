@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaInfoCircle, FaSave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import "./Orders.css";
+import styles from "./Orders.module.css";
 
 const API_BASE = "http://127.0.0.1:8000/api/bartoyou";
 
@@ -47,7 +47,6 @@ export default function Orders() {
     fetchData();
   }, [token]);
 
-  // Filtramos los pedidos según el estado
   useEffect(() => {
     const activeOrders = allOrders.filter(order => {
       return showCompleted ? true : order.status_id !== 3;
@@ -86,8 +85,8 @@ export default function Orders() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          ...orderToUpdate, // Envía todos los campos
-          status_id: orderToUpdate.status_id // Asegura el nuevo estado
+          ...orderToUpdate,
+          status_id: orderToUpdate.status_id
         }),
       });
 
@@ -96,7 +95,6 @@ export default function Orders() {
         throw new Error(errorData.message || "Error al actualizar el estado");
       }
 
-      // Actualización optimista
       const updatedOrders = allOrders.map(order => 
         order.id === orderId ? orderToUpdate : order
       );
@@ -106,18 +104,17 @@ export default function Orders() {
     } catch (err) {
       console.error("Error al guardar:", err);
       setError("Error al actualizar el estado: " + err.message);
-      setAllOrders([...allOrders]); // Revertir cambios
+      setAllOrders([...allOrders]);
     }
   };
 
   const startEditing = (orderId) => setEditingStatus(orderId);
 
   return (
-    <div className="orders-container">
-      <h1 className="orders-title">Pedidos Recientes</h1>
+    <div className={styles.ordersContainer}>
+      <h1 className={styles.ordersTitle}>Pedidos Recientes</h1>
 
-      {/* Toggle para mostrar/ocultar completados */}
-      <div className="toggle-completed">
+      <div className={styles.toggleCompleted}>
         <label>
           <input 
             type="checkbox" 
@@ -129,14 +126,14 @@ export default function Orders() {
       </div>
 
       {loading ? (
-        <p className="loading-message">Cargando pedidos...</p>
+        <p className={styles.loadingMessage}>Cargando pedidos...</p>
       ) : error ? (
-        <p className="error-message">{error}</p>
+        <p className={styles.errorMessage}>{error}</p>
       ) : filteredOrders.length === 0 ? (
-        <p className="no-orders-message">No hay pedidos registrados</p>
+        <p className={styles.noOrdersMessage}>No hay pedidos registrados</p>
       ) : (
-        <div className="orders-table-container">
-          <table className="orders-table">
+        <div className={styles.ordersTableContainer}>
+          <table className={styles.ordersTable}>
             <thead>
               <tr>
                 <th>ID Pedido</th>
@@ -160,11 +157,11 @@ export default function Orders() {
                   <td>{order.quantity}</td>
                   <td>
                     {editingStatus === order.id ? (
-                      <div className="status-edit-container">
+                      <div className={styles.statusEditContainer}>
                         <select
                           value={order.status_id}
                           onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                          className="status-select"
+                          className={styles.statusSelect}
                         >
                           {statuses.map((status) => (
                             <option key={status.id} value={status.id}>
@@ -174,14 +171,14 @@ export default function Orders() {
                         </select>
                         <button
                           onClick={() => saveStatusChange(order.id)}
-                          className="save-status-button"
+                          className={styles.saveStatusButton}
                         >
                           <FaSave />
                         </button>
                       </div>
                     ) : (
                       <span
-                        className={`status-badge status-${order.status_id}`}
+                        className={`${styles.statusBadge} ${styles[`status${order.status_id}`]}`}
                         onClick={() => startEditing(order.id)}
                       >
                         {statuses.find((s) => s.id === order.status_id)?.name ||
@@ -191,7 +188,7 @@ export default function Orders() {
                   </td>
                   <td>
                     <button
-                      className="details-button"
+                      className={styles.detailsButton}
                       onClick={() => {
                         const orderIdentifier = order.custom_drink_id?.replace("#", "") || order.id;
                         navigate(`/orders/${order.member_id}`);

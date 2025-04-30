@@ -8,6 +8,7 @@ import Carry from "./pages/Carry";
 import CustomDrink from "./pages/CustomDrink";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
+import ClientOrderDetails from "./pages/ClientOrderDetails";
 
 function App() {
   return (
@@ -60,6 +61,14 @@ function App() {
             element={
               //<ProtectedRoute>
                 <OrderDetails />
+              //</ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/ClientOrderDetails" 
+            element={
+              //<ProtectedRoute>
+                <ClientOrderDetails />
               //</ProtectedRoute>
             } 
           />

@@ -3,15 +3,15 @@ import { FaShoppingCart, FaChevronLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import DrinkCard from "../../components/DrinkCard/DrinkCard";
 import CategoryCard from "../../components/CategoryCard/CategoryCard";
-import "./DrinkMenu.css";
-import coctelesImg from '../../assets/DrinkCategory/1.png';
-import alcoholicosImg from '../../assets/DrinkCategory/2.png';
-import sinAlcoholImg from '../../assets/DrinkCategory/3.png';
-import digestivosImg from '../../assets/DrinkCategory/4.png';
-import aguasImg from '../../assets/DrinkCategory/5.png';
-import zumosImg from '../../assets/DrinkCategory/6.png';
-import batidosImg from '../../assets/DrinkCategory/7.png';
-import energyImg from '../../assets/DrinkCategory/8.png';
+import styles from "./DrinkMenu.module.css";
+import coctelesImg from "../../assets/DrinkCategory/1.png";
+import alcoholicosImg from "../../assets/DrinkCategory/2.png";
+import sinAlcoholImg from "../../assets/DrinkCategory/3.png";
+import digestivosImg from "../../assets/DrinkCategory/4.png";
+import aguasImg from "../../assets/DrinkCategory/5.png";
+import zumosImg from "../../assets/DrinkCategory/6.png";
+import batidosImg from "../../assets/DrinkCategory/7.png";
+import energyImg from "../../assets/DrinkCategory/8.png";
 
 export default function Menu() {
   const [drinks, setDrinks] = useState([]);
@@ -23,54 +23,54 @@ export default function Menu() {
 
   // Categorías definidas en frontend con imágenes locales
   const drinkCategories = [
-    { 
-      id: 1, 
-      name: "Cócteles clásicos", 
+    {
+      id: 1,
+      name: "Cócteles clásicos",
       image_url: coctelesImg,
-      description: "Mezclas creativas con alcohol"
+      description: "Mezclas creativas con alcohol",
     },
-    { 
-      id: 2, 
-      name: "Cócteles sin alcohol", 
+    {
+      id: 2,
+      name: "Cócteles sin alcohol",
       image_url: alcoholicosImg,
-      description: "Licores y bebidas espirituosas"
+      description: "Licores y bebidas espirituosas",
     },
-    { 
-      id: 3, 
-      name: "Destilados y licores", 
+    {
+      id: 3,
+      name: "Destilados y licores",
       image_url: sinAlcoholImg,
-      description: "Refrescantes y sin alcohol"
+      description: "Refrescantes y sin alcohol",
     },
-    { 
-      id: 4, 
-      name: "Cervezas", 
+    {
+      id: 4,
+      name: "Cervezas",
       image_url: digestivosImg,
-      description: "Para después de comer"
+      description: "Para después de comer",
     },
-    { 
-      id: 5, 
-      name: "Vinos y espumantes", 
+    {
+      id: 5,
+      name: "Vinos y espumantes",
       image_url: aguasImg,
-      description: "Minerales y sabores"
+      description: "Minerales y sabores",
     },
-    { 
-      id: 6, 
-      name: "Bebidas calientes", 
+    {
+      id: 6,
+      name: "Bebidas calientes",
       image_url: zumosImg,
-      description: "Naturales y recién exprimidos"
+      description: "Naturales y recién exprimidos",
     },
-    { 
-      id: 7, 
-      name: "Refrescos", 
+    {
+      id: 7,
+      name: "Refrescos",
       image_url: batidosImg,
-      description: "Naturales y recién exprimidos"
+      description: "Naturales y recién exprimidos",
     },
-    { 
-      id: 8, 
-      name: "Bebidas energéticas", 
+    {
+      id: 8,
+      name: "Bebidas energéticas",
       image_url: energyImg,
-      description: "Cremosos y deliciosos"
-    }
+      description: "Cremosos y deliciosos",
+    },
   ];
 
   useEffect(() => {
@@ -96,22 +96,23 @@ export default function Menu() {
   useEffect(() => {
     console.log("Drinks from API:", drinks);
   }, [drinks]);
-  
+
   useEffect(() => {
     let filtered = drinks;
-    
+
     if (search) {
       filtered = filtered.filter((drink) =>
         drink.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-    
+
     if (selectedCategory) {
       filtered = filtered.filter(
-        (drink) => drink.category_id.toString() === selectedCategory.id.toString()
+        (drink) =>
+          drink.category_id.toString() === selectedCategory.id.toString()
       );
     }
-    
+
     setFilteredDrinks(filtered);
   }, [search, selectedCategory, drinks]);
 
@@ -127,16 +128,16 @@ export default function Menu() {
   };
 
   return (
-    <div className="menu-container">
-      <h1 className="menu-title">
+    <div className={styles.menuContainer}>
+      <h1 className={styles.menuTitle}>
         {view === "categories" ? "Categorías de Bebidas" : selectedCategory?.name}
       </h1>
 
-      <div className="menu-actions">
+      <div className={styles.menuActions}>
         {view === "drinks" && (
           <button
             onClick={handleBackToCategories}
-            className="back-button"
+            className={styles.backButton}
           >
             <FaChevronLeft />
             Volver
@@ -149,20 +150,20 @@ export default function Menu() {
             placeholder="Buscar bebidas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
+            className={styles.searchInput}
           />
         )}
 
         <button
           onClick={() => navigate("/Carry")}
-          className="cart-button"
+          className={styles.cartButton}
         >
           <FaShoppingCart />
           Ir al Carrito
         </button>
       </div>
 
-      <div className={`items-grid ${view}-view`}>
+      <div className={`${styles.itemsGrid} ${styles[`${view}View`]}`}>
         {view === "categories" ? (
           drinkCategories.map((category) => (
             <CategoryCard

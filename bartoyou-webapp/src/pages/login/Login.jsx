@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Logo from '../../components/Logo';
-import './Login.css';
+import styles from './Login.module.css';
 
 function Login() {
   const [name, setName] = useState('');
@@ -30,13 +30,12 @@ function Login() {
 
       const data = await response.json();
 
-      if (response.ok && data.token) {  // Cambio importante aquí
+      if (response.ok && data.token) {
         console.log('Login exitoso:', data);
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         window.location.href = '/Dashboard';
       } else {
-        // Usamos data.error o data.message según lo que devuelva el backend
         setError(data.error || data.message || 'Error al iniciar sesión.');
       }
     } catch (error) {
@@ -46,17 +45,14 @@ function Login() {
       setLoading(false);
     }
   };
-//<Logo />
+
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="logo-container">
-          
-        </div>
+    <div className={styles.loginContainer}>
+      <div className={styles.loginBox}>
         <h2>Iniciar sesión</h2>
-        {error && <p className="error-message">{error}</p>}
+        {error && <p className={styles.errorMessage}>{error}</p>}
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Nombre:</label>
             <input
               type="text"
@@ -65,7 +61,7 @@ function Login() {
               required
             />
           </div>
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Contraseña:</label>
             <input
               type="password"
@@ -74,8 +70,14 @@ function Login() {
               required
             />
           </div>
-          <button type="submit" disabled={loading} className="submit-btn">
-            {loading ? 'Cargando...' : 'Ingresar'}
+          <button 
+            type="submit" 
+            disabled={loading} 
+            className={styles.submitBtn}
+          >
+            {loading ? (
+              <span className={styles.loadingText}>Cargando...</span>
+            ) : 'Ingresar'}
           </button>
         </form>
       </div>

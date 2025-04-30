@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronDown, FaChevronUp, FaSave } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
-import "./OrderDetails.css";
+import styles from "./OrderDetails.module.css"; // Updated import
 
 export default function OrderDetails() {
   const { userId } = useParams();
@@ -119,38 +119,52 @@ export default function OrderDetails() {
     return order.items?.map((item, index) => (
       <div 
         key={index} 
-        className={`order-item ${order.custom_drink_id ? 'custom-drink' : 'standard-drink'}`}
+        className={`${styles.orderItem} ${order.custom_drink_id ? styles.customDrink : styles.standardDrink}`}
       >
-        {/* Encabezado con nombre y tipo de bebida */}
-        <div className="item-header">
-          <h2 className="item-name">
+        <div className={styles.itemHeader}>
+          <h2 className={styles.itemName}>
             {item.name}
-            {order.custom_drink_id}
+            {order.custom_drink_id && (
+              <span className={styles.customBadge}>Personalizada</span>
+            )}
           </h2>
           
+          {item.image_url && (
+            <div className={styles.itemImageContainer}>
+              <img 
+                src={item.image_url} 
+                alt={item.name}
+                className={styles.itemImage}
+                onError={(e) => e.target.style.display = 'none'}
+              />
+            </div>
+          )}
         </div>
-  
-        {/* Ingredientes (solo para bebidas personalizadas) */}
+
+        {item.description && (
+          <p className={styles.itemDescription}>{item.description}</p>
+        )}
+
         {item.ingredients?.length > 0 && (
-          <div className="ingredients-section">
-            <h3 className="ingredients-title">
+          <div className={styles.ingredientsSection}>
+            <h3 className={styles.ingredientsTitle}>
               <span>Ingredientes</span>
             </h3>
-            <ul className="ingredients-list">
+            <ul className={styles.ingredientsList}>
               {item.ingredients.map((ingredient, idx) => (
-                <li key={idx} className="ingredient-item">
-                  <div className="ingredient-info">
+                <li key={idx} className={styles.ingredientItem}>
+                  <div className={styles.ingredientInfo}>
                     {ingredient.image_url && (
                       <img 
                         src={ingredient.image_url} 
                         alt={ingredient.ingredient}
-                        className="ingredient-image"
+                        className={styles.ingredientImage}
                         onError={(e) => e.target.style.display = 'none'}
                       />
                     )}
-                    <span className="ingredient-name">{ingredient.ingredient}</span>
+                    <span className={styles.ingredientName}>{ingredient.ingredient}</span>
                   </div>
-                  <span className="ingredient-amount">{ingredient.amount} ml</span>
+                  <span className={styles.ingredientAmount}>{ingredient.amount} ml</span>
                 </li>
               ))}
             </ul>
@@ -160,19 +174,19 @@ export default function OrderDetails() {
     ));
   };
 
-  if (loading) return <div className="loading-message">Cargando pedidos...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-  if (!allOrders.length) return <div className="no-order-message">No se encontraron pedidos</div>;
+  if (loading) return <div className={styles.loadingMessage}>Cargando pedidos...</div>;
+  if (error) return <div className={styles.errorMessage}>{error}</div>;
+  if (!allOrders.length) return <div className={styles.noOrderMessage}>No se encontraron pedidos</div>;
 
   return (
-    <div className="order-details-container">
-      <button onClick={() => navigate(-1)} className="back-button">
+    <div className={styles.orderDetailsContainer}>
+      <button onClick={() => navigate(-1)} className={styles.backButton}>
         <FaChevronLeft /> Volver
       </button>
 
-      <h1 className="order-details-title">Historial de Pedidos</h1>
+      <h1 className={styles.orderDetailsTitle}>Historial de Pedidos</h1>
 
-      <div className="toggle-completed">
+      <div className={styles.toggleCompleted}>
         <label>
           <input 
             type="checkbox" 
@@ -183,7 +197,7 @@ export default function OrderDetails() {
         </label>
       </div>
 
-      <div className="orders-list">
+      <div className={styles.ordersList}>
         {filteredOrders.map((order) => {
           const statusId = statuses.find(s => s.name === order.status)?.id;
           const isCustom = order.custom_drink_id !== null;
@@ -191,21 +205,21 @@ export default function OrderDetails() {
           return (
             <div 
               key={order.orderid} 
-              className={`order-card ${expandedOrder === order.orderid ? 'expanded' : ''}`}
+              className={`${styles.orderCard} ${expandedOrder === order.orderid ? styles.expanded : ''}`}
             >
-              <div className="order-header">
-                <div className="order-meta">
-                  <span className="order-id">
+              <div className={styles.orderHeader}>
+                <div className={styles.orderMeta}>
+                  <span className={styles.orderId}>
                     {isCustom ? `Bebida Personalizada ${order.custom_drink_id}` : `Pedido #${order.orderid}`}
                   </span>
-                  <span className="order-date">{formatDateTime(order.date_time)}</span>
+                  <span className={styles.orderDate}>{formatDateTime(order.date_time)}</span>
                   
                   {editingStatus === order.orderid ? (
-                    <div className="status-edit-container">
+                    <div className={styles.statusEditContainer}>
                       <select
                         value={statusId}
                         onChange={(e) => handleStatusChange(order.orderid, e.target.value)}
-                        className="status-select"
+                        className={styles.statusSelect}
                       >
                         {statuses.map(status => (
                           <option key={status.id} value={status.id}>
@@ -215,14 +229,14 @@ export default function OrderDetails() {
                       </select>
                       <button 
                         onClick={() => saveStatusChange(order.orderid)}
-                        className="save-status-button"
+                        className={styles.saveStatusButton}
                       >
                         <FaSave /> Guardar
                       </button>
                     </div>
                   ) : (
                     <span 
-                      className={`order-status status-${order.status.toLowerCase().replace(/\s/g, '-')}`}
+                      className={`${styles.orderStatus} ${styles[`status${order.status.replace(/\s/g, '')}`]}`}
                       onClick={() => startEditing(order.orderid)}
                     >
                       {order.status}
@@ -232,7 +246,7 @@ export default function OrderDetails() {
                 
                 <button 
                   onClick={() => toggleOrderDetails(order.orderid)}
-                  className="toggle-details-button"
+                  className={styles.toggleDetailsButton}
                 >
                   {expandedOrder === order.orderid ? (
                     <>
@@ -246,7 +260,7 @@ export default function OrderDetails() {
                 </button>
               </div>
 
-              <div className={`order-content ${expandedOrder === order.orderid ? 'show' : ''}`}>
+              <div className={`${styles.orderContent} ${expandedOrder === order.orderid ? styles.orderContentShow : ''}`}>
                 {renderOrderContent(order)}
               </div>
             </div>
