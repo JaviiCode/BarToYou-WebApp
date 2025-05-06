@@ -37,6 +37,12 @@ function Dashboard() {
         icon: customIcon,
         desc: 'Saca tu lado más personal creando tu propia bebida, escoge entre la gran variedad de ingredientes que tenemos. Relájate y disfruta mientras nuestros camareros hacen tu deseo realidad.',
         path: '/CustomDrink'
+      },
+      {
+        title: 'Seguimiento del pedido',
+        icon: customIcon,
+        desc: 'Haz un seguimiento del pedido, mira todos sus detalles incluso ancelalo si te has decidido por otra bebida.',
+        path: '/ClientOrderDetails'
       }
     ];
 
@@ -47,27 +53,21 @@ function Dashboard() {
         desc: 'Gestiona todos los pedidos activos del bar. Revisa el estado, marca como completado y lleva el control de lo que se está preparando.',
         path: '/Orders'
       },
+      {
+        title: 'Creación de Bebidas',
+        icon: customIcon,
+        desc: 'Gestiona todos los pedidos activos del bar. Revisa el estado, marca como completado y lleva el control de lo que se está preparando.',
+        path: '/AddDrinkForm'
+      }
     ];
 
     const adminCards = [
-      {
-        title: 'Estadísticas',
-        icon: customIcon,
-        desc: 'Accede a informes y análisis de ventas. Visualiza qué productos son más populares y toma decisiones basadas en datos.',
-        path: '/Statistics'
-      },
       {
         title: 'Administración',
         icon: customIcon,
         desc: 'Gestiona usuarios, roles y configuraciones del sistema. Área restringida solo para administradores.',
         path: '/Admin'
       },
-      {
-        title: 'Menú del Bar',
-        icon: customIcon,
-        desc: 'Administra la carta de bebidas disponibles. Añade nuevos productos, modifica existentes o actualiza precios.',
-        path: '/BarMenu'
-      }
     ];
 
     if (role === 'Admin' || role === 'Administrador') {
@@ -93,6 +93,7 @@ function Dashboard() {
             icon={card.icon}
             desc={card.desc}
             path={card.path}
+            
           />
         ))}
       </div>

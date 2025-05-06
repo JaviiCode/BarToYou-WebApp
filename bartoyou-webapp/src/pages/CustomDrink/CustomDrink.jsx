@@ -17,6 +17,7 @@ const CustomDrink = () => {
   const [availableIngredients, setAvailableIngredients] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Obtener datos de la API
   useEffect(() => {
@@ -37,14 +38,17 @@ const CustomDrink = () => {
           }),
         ]);
 
+        if (!basesRes.ok) throw new Error("Error al obtener bebidas base");
+        if (!ingredientsRes.ok) throw new Error("Error al obtener ingredientes");
+
         const basesData = await basesRes.json();
         const ingredientsData = await ingredientsRes.json();
 
-        setAvailableBases(basesData.data);
-        setAvailableIngredients(ingredientsData.data);
+        setAvailableBases(basesData.data || []);
+        setAvailableIngredients(ingredientsData.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
-        alert("Error al cargar los datos. Por favor recarga la página.");
+        setError("Error al cargar los datos. Por favor recarga la página.");
       } finally {
         setIsLoading(false);
       }
@@ -54,7 +58,6 @@ const CustomDrink = () => {
   }, []);
 
   useEffect(() => {
-    // Actualizar el preview cada vez que cambien los datos
     if (availableIngredients.length > 0) {
       setPreviewData({
         ...formData,
@@ -106,7 +109,6 @@ const CustomDrink = () => {
           : parseInt(value)
         : value;
 
-    // Actualizar la unidad automáticamente si cambia el ingrediente
     if (field === "ingredient_id") {
       const selectedIngredient = availableIngredients.find(
         (i) => i.id === parseInt(value)
@@ -135,18 +137,29 @@ const CustomDrink = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
+
+    // Validación básica
+    if (!formData.base_drink_id) {
+      setError("Debes seleccionar una bebida base");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (formData.ingredients.length === 0) {
+      setError("Debes añadir al menos un ingrediente");
+      setIsSubmitting(false);
+      return;
+    }
 
     const cleanedIngredients = formData.ingredients.filter(
-      (ing) =>
-        ing.ingredient_id && ing.amount > 0 && ing.unit && ing.consumption_id
+      (ing) => ing.ingredient_id && ing.amount > 0
     );
 
     const payload = {
       ...formData,
       ingredients: cleanedIngredients,
     };
-
-    console.log("📦 Payload que se enviará:", payload);
 
     try {
       const token = localStorage.getItem("token");
@@ -159,22 +172,22 @@ const CustomDrink = () => {
         body: JSON.stringify(payload),
       });
 
+      const responseText = await response.text();
       let result;
+
       try {
-        result = await response.json();
-      } catch (jsonError) {
-        const text = await response.text(); // Si no es JSON, obtenemos el texto plano
-        console.error("❌ Respuesta no JSON:", text);
-        throw new Error("Respuesta no válida del servidor");
+        result = JSON.parse(responseText);
+      } catch {
+        throw new Error(responseText || "Respuesta no válida del servidor");
       }
 
       if (!response.ok) {
-        console.error("❌ Error del servidor:", result);
         throw new Error(result.message || "Error en la petición");
       }
 
       alert(`✅ Bebida personalizada creada con ID ${result.custom_drink_id}`);
 
+      // Resetear formulario
       setFormData({
         user_id: storedUser?.id || null,
         base_drink: "",
@@ -184,8 +197,8 @@ const CustomDrink = () => {
         ice_type: "",
       });
     } catch (error) {
-      console.error("⚠️ Error en el envío:", error);
-      alert("Hubo un error al crear la bebida. Revisa los campos.");
+      console.error("Error en el envío:", error);
+      setError(error.message || "Hubo un error al crear la bebida. Revisa los campos.");
     } finally {
       setIsSubmitting(false);
     }
@@ -203,6 +216,8 @@ const CustomDrink = () => {
   return (
     <div className={styles.customDrinkPage}>
       <h1 className={styles.pageTitle}>Crear Bebida Personalizada</h1>
+
+      {error && <div className={styles.errorMessage}>{error}</div>}
 
       <div className={styles.formContainer}>
         <form onSubmit={handleSubmit} className={styles.drinkForm}>
@@ -307,7 +322,11 @@ const CustomDrink = () => {
             </div>
           )}
 
-          <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+          <button 
+            type="submit" 
+            className={styles.submitBtn} 
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Enviando..." : "Crear Bebida"}
           </button>
         </form>

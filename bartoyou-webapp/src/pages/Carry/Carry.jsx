@@ -10,6 +10,7 @@ const Carry = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [editQuantity, setEditQuantity] = useState(1);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (cookies.cart) {
@@ -64,12 +65,13 @@ const Carry = () => {
     }
 
     setIsSubmitting(true);
+    setError(null);
     const token = localStorage.getItem("token");
     
     try {
       const orderPromises = cartItems.map(item => {
         const orderData = {
-          member_id: 3,
+          member_id: 3, // ¿Debería ser dinámico según el usuario logueado?
           consumption_id: item.id,
           quantity: item.quantity,
           status_id: 1
@@ -86,7 +88,20 @@ const Carry = () => {
       });
 
       const responses = await Promise.all(orderPromises);
+      
+      // Verificar primero si la respuesta es OK
+      const allOk = responses.every(res => res.ok);
+      
+      if (!allOk) {
+        const errorResponses = await Promise.all(
+          responses.map(res => res.text().then(text => ({ status: res.status, text })))
+        );
+        console.error("Error responses:", errorResponses);
+        throw new Error("Algunas peticiones fallaron");
+      }
+
       const results = await Promise.all(responses.map(res => res.json()));
+      console.log("Order results:", results);
 
       const allSuccess = results.every(result => result.success !== false);
       
@@ -99,7 +114,7 @@ const Carry = () => {
       }
     } catch (error) {
       console.error("Error al realizar el pedido:", error);
-      alert("Ocurrió un error al procesar tu pedido. Por favor intenta nuevamente.");
+      setError("Error al procesar el pedido. Verifica tu conexión o intenta más tarde.");
     } finally {
       setIsSubmitting(false);
     }
@@ -108,6 +123,8 @@ const Carry = () => {
   return (
     <div className={styles.carryContainer}>
       <h1 className={styles.carryTitle}>Mi Carrito</h1>
+      
+      {error && <div className={styles.errorMessage}>{error}</div>}
       
       <div className={styles.cartItemsContainer}>
         {cartItems.length > 0 ? (

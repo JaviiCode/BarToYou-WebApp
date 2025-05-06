@@ -32,8 +32,21 @@ function Login() {
 
       if (response.ok && data.token) {
         console.log('Login exitoso:', data);
+        
+        // Almacenar datos de forma consistente
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Crear estructura authData consistente con los mismos datos
+        const authData = {
+          token: data.token,
+          user: {
+            id: data.user.id,
+            role: data.user.role_id === 1 ? 'Admin' : 'User' // Ajusta según tu lógica de roles
+          }
+        };
+        localStorage.setItem('authData', JSON.stringify(authData));
+        
         window.location.href = '/Dashboard';
       } else {
         setError(data.error || data.message || 'Error al iniciar sesión.');

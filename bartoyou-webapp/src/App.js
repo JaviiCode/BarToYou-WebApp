@@ -9,6 +9,7 @@ import CustomDrink from "./pages/CustomDrink";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import ClientOrderDetails from "./pages/ClientOrderDetails";
+import AddDrinkForm from "./pages/AddDrinkForm";
 
 function App() {
   return (
@@ -69,6 +70,14 @@ function App() {
             element={
               //<ProtectedRoute>
                 <ClientOrderDetails />
+              //</ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/AddDrinkForm" 
+            element={
+              //<ProtectedRoute>
+                <AddDrinkForm />
               //</ProtectedRoute>
             } 
           />
