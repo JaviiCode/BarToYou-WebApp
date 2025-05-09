@@ -20,7 +20,7 @@ function Login() {
     setError('');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/login.php', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/login.php`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ function Login() {
           token: data.token,
           user: {
             id: data.user.id,
-            role: data.user.role_id === 1 ? 'Admin' : 'User' // Ajusta según tu lógica de roles
+            role: data.user.role_id === 1 ? 'Admin' : 'User'
           }
         };
         localStorage.setItem('authData', JSON.stringify(authData));

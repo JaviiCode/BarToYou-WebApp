@@ -10,6 +10,7 @@ import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import ClientOrderDetails from "./pages/ClientOrderDetails";
 import AddDrinkForm from "./pages/AddDrinkForm";
+import ConsumptionsPage from "./pages/ConsumptionsPage";
 
 function App() {
   return (
@@ -78,6 +79,14 @@ function App() {
             element={
               //<ProtectedRoute>
                 <AddDrinkForm />
+              //</ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/ConsumptionsPage" 
+            element={
+              //<ProtectedRoute>
+                <ConsumptionsPage />
               //</ProtectedRoute>
             } 
           />

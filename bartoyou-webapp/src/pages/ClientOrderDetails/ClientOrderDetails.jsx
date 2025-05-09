@@ -2,14 +2,33 @@ import { useState, useEffect } from 'react';
 import { FaChevronLeft, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import styles from './ClientOrderDetails.module.css';
+import Alert from "../../components/Alert/Alert";
 
 export default function ClientOrderDetails() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [expandedOrders, setExpandedOrders] = useState({}); // { orderId: boolean }
-  const [expandedItems, setExpandedItems] = useState({}); // { orderId: { itemIndex: boolean } }
+  const [expandedOrders, setExpandedOrders] = useState({});
+  const [expandedItems, setExpandedItems] = useState({});
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: null,
+    showCancel: true
+  });
+
+  const showCustomAlert = (title, message, type = 'info', onConfirm = null, showCancel = true) => {
+    setAlertConfig({
+      title,
+      message,
+      type,
+      onConfirm,
+      showCancel
+    });
+    setShowAlert(true);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -17,14 +36,20 @@ export default function ClientOrderDetails() {
     const userId = authData?.user?.id;
 
     if (!userId || !token) {
-      setError('No se encontró información del usuario');
+      showCustomAlert(
+        'Error de autenticación',
+        'No se encontró información del usuario. Por favor, inicia sesión nuevamente.',
+        'error',
+        () => navigate('/login'),
+        false
+      );
       setLoading(false);
       return;
     }
 
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/orders/user/${userId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/user/${userId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -49,14 +74,18 @@ export default function ClientOrderDetails() {
         setExpandedOrders(initialExpandedOrders);
         setExpandedItems(initialExpandedItems);
       } catch (err) {
-        setError(err.message);
+        showCustomAlert(
+          'Error',
+          err.message || 'Error al cargar los pedidos',
+          'error'
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, []);
+  }, [navigate]);
 
   const toggleOrder = (orderId) => {
     setExpandedOrders(prev => ({
@@ -76,31 +105,46 @@ export default function ClientOrderDetails() {
   };
 
   const handleCancelOrder = async (orderId) => {
-    if (!window.confirm('¿Estás seguro de que quieres cancelar este pedido?')) return;
+    showCustomAlert(
+      'Confirmar cancelación',
+      '¿Estás seguro de que quieres cancelar este pedido?',
+      'info',
+      async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/orders/${orderId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            }
+          });
 
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://127.0.0.1:8000/api/orders/${orderId}/cancel`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          if (!response.ok) throw new Error('Error al cancelar el pedido');
+
+          const result = await response.json();
+          if (result.success) {
+            setOrders(prev => prev.map(o =>
+              o.orderid === orderId ? { ...o, status: 'Cancelado' } : o
+            ));
+            showCustomAlert(
+              'Pedido cancelado',
+              'El pedido ha sido cancelado exitosamente',
+              'success',
+              null,
+              false
+            );
+          }
+        } catch (err) {
+          console.error('Error:', err);
+          showCustomAlert(
+            'Error',
+            'Error al cancelar el pedido: ' + err.message,
+            'error'
+          );
         }
-      });
-
-      if (!response.ok) throw new Error('Error al cancelar el pedido');
-
-      const result = await response.json();
-      if (result.success) {
-        setOrders(prev => prev.map(o =>
-          o.orderid === orderId ? { ...o, status: 'Cancelado' } : o
-        ));
-        alert('Pedido cancelado exitosamente');
       }
-    } catch (err) {
-      console.error('Error:', err);
-      setError('Error al cancelar el pedido: ' + err.message);
-    }
+    );
   };
 
   const getStatusPercentage = (status) => {
@@ -127,7 +171,6 @@ export default function ClientOrderDetails() {
   };
 
   if (loading) return <div className={styles.loadingMessage}>Cargando pedidos...</div>;
-  if (error) return <div className={styles.errorMessage}>{error}</div>;
   if (!orders.length) return <div className={styles.noOrderMessage}>No se encontraron pedidos activos</div>;
 
   return (
@@ -213,7 +256,7 @@ export default function ClientOrderDetails() {
                     >
                       {item.image_url && (
                         <img
-                          src={`http://127.0.0.1:8000${item.image_url}`}
+                          src={`${process.env.REACT_APP_API_URL}${item.image_url}`}
                           alt={item.name}
                           className={styles.itemImage}
                           onError={(e) => {
@@ -258,6 +301,18 @@ export default function ClientOrderDetails() {
           )}
         </div>
       ))}
+
+      <Alert
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText="Confirmar"
+        cancelText="Cancelar"
+        type={alertConfig.type}
+      />
     </div>
   );
 }

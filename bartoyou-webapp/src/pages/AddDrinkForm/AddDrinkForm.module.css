@@ -14,6 +14,24 @@
     font-weight: 500;
     font-size: 1.8rem;
   }
+
+.backButton {
+  padding: 8px 12px;
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s;
+  margin-bottom: 20px;
+}
+
+.backButton:hover {
+  background-color: #c53030;
+}
   
   .form {
     display: flex;

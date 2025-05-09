@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import styles from './Carry.module.css';
 import { FaTrash, FaEdit, FaCheck } from 'react-icons/fa';
+import Alert from "../../components/Alert/Alert";
 
 const Carry = () => {
   const [cookies, setCookie, removeCookie] = useCookies(['cart']);
@@ -11,6 +12,13 @@ const Carry = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [editQuantity, setEditQuantity] = useState(1);
   const [error, setError] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    onConfirm: null,
+    showCancel: true
+  });
 
   useEffect(() => {
     if (cookies.cart) {
@@ -27,6 +35,16 @@ const Carry = () => {
       setHasAlcoholicDrinks(alcoholic);
     }
   }, [cookies.cart]);
+
+  const showCustomAlert = (title, message, onConfirm, showCancel = true) => {
+    setAlertConfig({
+      title,
+      message,
+      onConfirm,
+      showCancel
+    });
+    setShowAlert(true);
+  };
 
   const handleRemoveItem = (itemId) => {
     const updatedCart = cartItems.filter(item => item.id !== itemId);
@@ -57,27 +75,48 @@ const Carry = () => {
 
   const handlePlaceOrder = async () => {
     if (hasAlcoholicDrinks) {
-      const isAdult = window.confirm("Hay bebidas alcohólicas en tu pedido. ¿Eres mayor de 18 años?");
-      if (!isAdult) {
-        alert("Pedido cancelado. Debes ser mayor de edad para comprar bebidas alcohólicas.");
-        return;
-      }
+      showCustomAlert(
+        "Verificación de edad",
+        "Hay bebidas alcohólicas en tu pedido. ¿Eres mayor de 18 años?",
+        () => proceedWithOrder(),
+        true
+      );
+      return;
     }
+    await proceedWithOrder();
+  };
 
+  const proceedWithOrder = async () => {
     setIsSubmitting(true);
     setError(null);
     const token = localStorage.getItem("token");
     
     try {
+      const userData = localStorage.getItem("user");
+      let memberId = 0;
+      
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          memberId = user.id || 0;
+        } catch (e) {
+          console.error("Error parsing user data:", e);
+        }
+      }
+
+      if (memberId === 0) {
+        throw new Error("No se pudo obtener el ID del usuario");
+      }
+
       const orderPromises = cartItems.map(item => {
         const orderData = {
-          member_id: 3, // ¿Debería ser dinámico según el usuario logueado?
+          member_id: memberId,
           consumption_id: item.id,
           quantity: item.quantity,
           status_id: 1
         };
 
-        return fetch("http://127.0.0.1:8000/api/bartoyou/orders/", {
+        return fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/orders/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -89,7 +128,6 @@ const Carry = () => {
 
       const responses = await Promise.all(orderPromises);
       
-      // Verificar primero si la respuesta es OK
       const allOk = responses.every(res => res.ok);
       
       if (!allOk) {
@@ -106,15 +144,26 @@ const Carry = () => {
       const allSuccess = results.every(result => result.success !== false);
       
       if (allSuccess) {
-        alert("¡Pedido realizado con éxito!");
-        removeCookie('cart', { path: '/' });
-        setCartItems([]);
+        showCustomAlert(
+          "¡Éxito!",
+          "Pedido realizado con éxito",
+          () => {
+            removeCookie('cart', { path: '/' });
+            setCartItems([]);
+          },
+          false
+        );
       } else {
         throw new Error("Algunos items no pudieron ser procesados");
       }
     } catch (error) {
       console.error("Error al realizar el pedido:", error);
-      setError("Error al procesar el pedido. Verifica tu conexión o intenta más tarde.");
+      showCustomAlert(
+        "Error",
+        "Error al procesar el pedido. Verifica tu conexión o intenta más tarde.",
+        null,
+        false
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -191,6 +240,17 @@ const Carry = () => {
           <p className={styles.emptyCartMessage}>Tu carrito está vacío</p>
         )}
       </div>
+
+      <Alert
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText="Confirmar"
+        cancelText="Cancelar"
+      />
     </div>
   );
 };

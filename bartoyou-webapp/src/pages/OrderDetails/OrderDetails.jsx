@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronDown, FaChevronUp, FaSave } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
-import styles from "./OrderDetails.module.css"; // Updated import
+import styles from "./OrderDetails.module.css";
+import Alert from "../../components/Alert/Alert";
 
 export default function OrderDetails() {
   const { userId } = useParams();
@@ -10,10 +11,28 @@ export default function OrderDetails() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: null,
+    showCancel: false
+  });
+
+  const showCustomAlert = (title, message, type = 'info', onConfirm = null, showCancel = false) => {
+    setAlertConfig({
+      title,
+      message,
+      type,
+      onConfirm,
+      showCancel
+    });
+    setShowAlert(true);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -39,7 +58,11 @@ export default function OrderDetails() {
         setStatuses(statusesData.data || statusesData);
       } catch (error) {
         console.error("Error:", error);
-        setError(error.message);
+        showCustomAlert(
+          "Error",
+          error.message,
+          "error"
+        );
       } finally {
         setLoading(false);
       }
@@ -93,7 +116,10 @@ export default function OrderDetails() {
         }),
       });
 
-      if (!response.ok) throw new Error("Error al actualizar el estado");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al actualizar el estado");
+      }
 
       const updatedOrders = allOrders.map(order => 
         order.orderid === orderId ? { 
@@ -104,9 +130,19 @@ export default function OrderDetails() {
 
       setAllOrders(updatedOrders);
       setEditingStatus(null);
+      
+      showCustomAlert(
+        "Éxito",
+        "Estado del pedido actualizado correctamente",
+        "success"
+      );
     } catch (error) {
       console.error("Error:", error);
-      setError("Error al actualizar: " + error.message);
+      showCustomAlert(
+        "Error",
+        "Error al actualizar: " + error.message,
+        "error"
+      );
       setAllOrders([...allOrders]);
     }
   };
@@ -175,7 +211,6 @@ export default function OrderDetails() {
   };
 
   if (loading) return <div className={styles.loadingMessage}>Cargando pedidos...</div>;
-  if (error) return <div className={styles.errorMessage}>{error}</div>;
   if (!allOrders.length) return <div className={styles.noOrderMessage}>No se encontraron pedidos</div>;
 
   return (
@@ -267,6 +302,18 @@ export default function OrderDetails() {
           );
         })}
       </div>
+
+      <Alert
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText="Aceptar"
+        cancelText="Cancelar"
+        type={alertConfig.type}
+      />
     </div>
   );
 }

@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 
 import menuIcon from "../../assets/icons/menu.png";
 import customIcon from "../../assets/icons/custom.png";
-// import ordersIcon from "../../assets/icons/orders.png";
-// import adminIcon from "../../assets/icons/admin.png";
-// import statsIcon from "../../assets/icons/stats.png";
+import followOrder from "../../assets/icons/followOrder.png";
+import addDrink from "../../assets/icons/addDrink.png";
+import logs from "../../assets/icons/logs.png";
 
 function Dashboard() {
   const [cards, setCards] = useState([]);
@@ -40,7 +40,7 @@ function Dashboard() {
       },
       {
         title: 'Seguimiento del pedido',
-        icon: customIcon,
+        icon: followOrder,
         desc: 'Haz un seguimiento del pedido, mira todos sus detalles incluso ancelalo si te has decidido por otra bebida.',
         path: '/ClientOrderDetails'
       }
@@ -49,24 +49,24 @@ function Dashboard() {
     const staffCards = [
       {
         title: 'Listado de Pedidos',
-        icon: customIcon,
+        icon: followOrder,
         desc: 'Gestiona todos los pedidos activos del bar. Revisa el estado, marca como completado y lleva el control de lo que se está preparando.',
         path: '/Orders'
       },
       {
         title: 'Creación de Bebidas',
-        icon: customIcon,
-        desc: 'Gestiona todos los pedidos activos del bar. Revisa el estado, marca como completado y lleva el control de lo que se está preparando.',
+        icon: addDrink,
+        desc: 'Crea bebidas que se añadiran automaticamente al menú',
         path: '/AddDrinkForm'
       }
     ];
 
     const adminCards = [
       {
-        title: 'Administración',
-        icon: customIcon,
-        desc: 'Gestiona usuarios, roles y configuraciones del sistema. Área restringida solo para administradores.',
-        path: '/Admin'
+        title: 'Edita y elimina bebidas',
+        icon: logs,
+        desc: 'Edita y elimina bebidas',
+        path: '/ConsumptionsPage'
       },
     ];
 
@@ -82,7 +82,7 @@ function Dashboard() {
   return (
     <div className={styles.dashboardContainer}>
       <div className={styles.dashboardHeader}>
-        <h1>Brand You Agency</h1>
+        <h1>Bienvenido a BartoYou</h1>
       </div>
 
       <div className={styles.cardsContainer}>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import styles from "./CustomDrink.module.css";
+import Alert from "../../components/Alert/Alert";
 
 const CustomDrink = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -17,7 +18,25 @@ const CustomDrink = () => {
   const [availableIngredients, setAvailableIngredients] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: null,
+    showCancel: false
+  });
+
+  const showCustomAlert = (title, message, type = 'info', onConfirm = null, showCancel = false) => {
+    setAlertConfig({
+      title,
+      message,
+      type,
+      onConfirm,
+      showCancel
+    });
+    setShowAlert(true);
+  };
 
   // Obtener datos de la API
   useEffect(() => {
@@ -26,12 +45,12 @@ const CustomDrink = () => {
         const token = localStorage.getItem("token");
 
         const [basesRes, ingredientsRes] = await Promise.all([
-          fetch("http://127.0.0.1:8000/api/bartoyou/consumptions", {
+          fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/consumptions`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }),
-          fetch("http://127.0.0.1:8000/api/bartoyou/ingredients", {
+          fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/ingredients`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -48,7 +67,11 @@ const CustomDrink = () => {
         setAvailableIngredients(ingredientsData.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError("Error al cargar los datos. Por favor recarga la página.");
+        showCustomAlert(
+          "Error de carga",
+          "Error al cargar los datos. Por favor recarga la página.",
+          "error"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -91,8 +114,7 @@ const CustomDrink = () => {
       ingredients: [
         ...formData.ingredients,
         {
-          consumption_id: 1,
-          ingredient_id: "",
+          ingredient_id: null,
           amount: "",
           unit: "ml",
         },
@@ -137,33 +159,60 @@ const CustomDrink = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
 
     // Validación básica
     if (!formData.base_drink_id) {
-      setError("Debes seleccionar una bebida base");
+      showCustomAlert(
+        "Validación",
+        "Debes seleccionar una bebida base",
+        "error"
+      );
       setIsSubmitting(false);
       return;
     }
 
     if (formData.ingredients.length === 0) {
-      setError("Debes añadir al menos un ingrediente");
+      showCustomAlert(
+        "Validación",
+        "Debes añadir al menos un ingrediente",
+        "error"
+      );
       setIsSubmitting(false);
       return;
     }
 
-    const cleanedIngredients = formData.ingredients.filter(
-      (ing) => ing.ingredient_id && ing.amount > 0
+    // Validar que todos los ingredientes tengan ID y cantidad válida
+    const hasInvalidIngredients = formData.ingredients.some(
+      ing => !ing.ingredient_id || ing.amount <= 0
     );
 
+    if (hasInvalidIngredients) {
+      showCustomAlert(
+        "Validación",
+        "Todos los ingredientes deben tener un elemento seleccionado y una cantidad válida",
+        "error"
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    const cleanedIngredients = formData.ingredients.map(ing => ({
+      ingredient_id: ing.ingredient_id,
+      amount: ing.amount,
+      unit: ing.unit
+    }));
+
     const payload = {
-      ...formData,
+      user_id: formData.user_id,
+      base_drink_id: formData.base_drink_id,
       ingredients: cleanedIngredients,
+      ice: formData.ice,
+      ice_type: formData.ice_type
     };
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://127.0.0.1:8000/api/custom-drink", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/custom-drink`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -185,20 +234,30 @@ const CustomDrink = () => {
         throw new Error(result.message || "Error en la petición");
       }
 
-      alert(`✅ Bebida personalizada creada con ID ${result.custom_drink_id}`);
-
-      // Resetear formulario
-      setFormData({
-        user_id: storedUser?.id || null,
-        base_drink: "",
-        base_drink_id: null,
-        ingredients: [],
-        ice: false,
-        ice_type: "",
-      });
+      showCustomAlert(
+        "¡Éxito!",
+        `Bebida personalizada creada con ID ${result.custom_drink_id}`,
+        "success",
+        () => {
+          // Resetear formulario
+          setFormData({
+            user_id: storedUser?.id || null,
+            base_drink: "",
+            base_drink_id: null,
+            ingredients: [],
+            ice: false,
+            ice_type: "",
+          });
+        },
+        false
+      );
     } catch (error) {
       console.error("Error en el envío:", error);
-      setError(error.message || "Hubo un error al crear la bebida. Revisa los campos.");
+      showCustomAlert(
+        "Error",
+        error.message || "Hubo un error al crear la bebida. Revisa los campos.",
+        "error"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -216,8 +275,6 @@ const CustomDrink = () => {
   return (
     <div className={styles.customDrinkPage}>
       <h1 className={styles.pageTitle}>Crear Bebida Personalizada</h1>
-
-      {error && <div className={styles.errorMessage}>{error}</div>}
 
       <div className={styles.formContainer}>
         <form onSubmit={handleSubmit} className={styles.drinkForm}>
@@ -358,6 +415,18 @@ const CustomDrink = () => {
           )}
         </div>
       </div>
+
+      <Alert
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onConfirm={alertConfig.onConfirm}
+        showCancel={alertConfig.showCancel}
+        confirmText="Aceptar"
+        cancelText="Cancelar"
+        type={alertConfig.type}
+      />
     </div>
   );
 };
