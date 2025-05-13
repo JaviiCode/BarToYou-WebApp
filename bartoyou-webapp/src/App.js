@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CookiesProvider } from "react-cookie"; // Importa CookiesProvider
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.jsx";
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import Dashboard from "./pages/Dashboard";
 import DrinkMenu from "./pages/DrinkMenu";
 import Carry from "./pages/Carry";

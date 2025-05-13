@@ -55,7 +55,7 @@ const ConsumptionsPage = () => {
 
   const fetchConsumptions = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/consumptions/`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/consumptions`, {
         headers: getAuthHeaders()
       });
 

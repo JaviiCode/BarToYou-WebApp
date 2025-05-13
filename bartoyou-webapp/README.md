@@ -1,70 +1,48 @@
-# Getting Started with Create React App
+# BarToYou Web App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![Logo BarToYou](./assets/logo.png)
 
-## Available Scripts
+## Descripción del proyecto
 
-In the project directory, you can run:
+Web App desarrollada en **React 19.0.0** que permite a los usuarios realizar pedidos, crear bebidas personalizadas y hacer seguimiento de sus pedidos en bares de hoteles todo incluido.  
+La aplicación proporciona una interfaz amigable y moderna orientada a usuarios sin experiencia previa en tecnologías digitales.
 
-### `npm start`
+## Tecnologías utilizadas
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **React 19.0.0**
+- **HTML / CSS Modular**
+- **JavaScript ES6+**
+- **Axios (para consumir la API)**
+- **NPM**
+- **VSCode**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Instalación y configuración
 
-### `npm test`
+1. Clonar el repositorio:  
+   `git clone https://github.com/JaviiCode/BarToYou-WebApp`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. Instalar dependencias:  
+   `npm install`
 
-### `npm run build`
+3. Iniciar la aplicación:  
+   `npm start`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Organización del código
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **/src/pages**: páginas principales.
+- **/src/components**: componentes reutilizables.
+- **/src/assets**: imágenes y multimedia.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Buenas prácticas
 
-### `npm run eject`
+- Uso de componentes reutilizables.
+- Validación de formularios en el cliente.
+- Manejo de estado limpio y modular.
+- Código comentado y limpio (sin console.log ni alert en producción).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Mantenimiento
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Verificar la compatibilidad en navegadores modernos.
+- Actualizar dependencias periódicamente.
+- Testing funcional tras cambios importantes.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

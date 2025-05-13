@@ -39,14 +39,13 @@ export default function OrderDetails() {
 
     const fetchData = async () => {
       try {
-        const [ordersResponse, statusesResponse] = await Promise.all([
-          fetch(`http://127.0.0.1:8000/api/orders/user/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch("http://127.0.0.1:8000/api/bartoyou/order-statuses", {
+	const ordersResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/user/${userId}`, {
             headers: { Authorization: `Bearer ${token}` }
           })
-        ]);
+
+	const statusesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/order-statuses`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
 
         if (!ordersResponse.ok) throw new Error("Error al obtener pedidos");
         if (!statusesResponse.ok) throw new Error("Error al obtener estados");
@@ -105,7 +104,7 @@ export default function OrderDetails() {
     const orderToUpdate = allOrders.find(order => order.orderid === orderId);
     
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/bartoyou/orders/${orderId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/bartoyou/orders/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
