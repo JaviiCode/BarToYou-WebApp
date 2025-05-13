@@ -46,3 +46,8 @@ La aplicación proporciona una interfaz amigable y moderna orientada a usuarios 
 - Actualizar dependencias periódicamente.
 - Testing funcional tras cambios importantes.
 
+## Contacto
+
+📧 [javiigcode@gmail.com](mailto:javiigcode@gmail.com)  
+🔗 [LinkedIn - Javier González](https://www.linkedin.com/in/javier-gonz%C3%A1lez-12a058249/)
+
