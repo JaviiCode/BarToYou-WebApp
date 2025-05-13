@@ -1,6 +1,6 @@
 # BarToYou Web App
 
-![Logo BarToYou](./bartoyou-webapp/src/assets/previews/portada.png)
+![Logo BarToYou](./bartoyou-webapp/src/assets/previews/Portada.png)
 
 ## Descripción del proyecto
 
